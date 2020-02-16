@@ -24,8 +24,8 @@ this plugin.
 
 ## Example
 
-Here's an configuration example for NERDTree, Tagbar and Undotree at the left
-side.
+Here's an example of configuration for NERDTree, Tagbar and Undotree at the
+left side.
 
 ```vim
 let g:NERDTreeWinPos = 'left'
@@ -61,6 +61,10 @@ call sidebar#register({
   \ 'open': 'UndotreeShow',
   \ 'close': 'UndotreeHide'
   \ })
+
+noremap <silent> <M-1> :call sidebar#toggle('nerdtree')<CR>
+noremap <silent> <M-2> :call sidebar#toggle('tagbar')<CR>
+noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
 ```
 
 Notes:
