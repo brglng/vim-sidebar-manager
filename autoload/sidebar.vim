@@ -20,7 +20,7 @@ endfunction
 
 function! sidebar#switch(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[name].position)
+    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[a:name].position)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
@@ -32,7 +32,7 @@ function! sidebar#switch(name)
     if found_desired_nr > 0
         execute found_desired_nr . 'wincmd w'
     else
-        call call(s:sidebars[name].open, [])
+        call call(s:sidebars[a:name].open, [])
     endif
 endfunction
 
@@ -42,7 +42,7 @@ endfunction
 
 function! sidebar#toggle(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[name].position)
+    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[a:name].position)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
@@ -52,8 +52,8 @@ function! sidebar#toggle(name)
     endfor
 
     if found_desired_nr > 0
-        call call(s:sidebars[name].close, [])
+        call call(s:sidebars[a:name].close, [])
     else
-        call call(s:sidebars[name].open, [])
+        call call(s:sidebars[a:name].open, [])
     endif
 endfunction
