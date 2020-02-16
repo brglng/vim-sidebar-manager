@@ -4,7 +4,7 @@ A sidebar manger for Vim/Neovim to mimic an IDE-like UI layout.
 
 ## TL;DR
 
-[Screencast](images/screencast.png)
+![Screencast](images/screencast.png)
 
 ## Motivation
 
