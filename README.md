@@ -82,5 +82,7 @@ Notes:
 - The `open` and `close` fields can be either a string of command or a
   Funcref.
 
+For more examples, please refer to the [Wiki page](wiki/Examples)
+
 <!-- vim: ts=8 sts=4 sw=4 et cc=79
 -->
