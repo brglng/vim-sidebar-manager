@@ -57,7 +57,7 @@ call sidebar#register({
 call sidebar#register({
   \ 'name': 'undotree',
   \ 'position': 'left',
-  \ 'check_nr': {nr -> getwinvar(nr, '&filetype') =~ 'undotree'},
+  \ 'check_nr': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
   \ 'open': 'UndotreeShow',
   \ 'close': 'UndotreeHide'
   \ })
