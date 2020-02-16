@@ -20,7 +20,7 @@ endfunction
 
 function! sidebar#switch(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[a:name].position)
+    for [found_nr, found_name] in items(s:find_windows_at_position(s:sidebars[a:name].position))
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
@@ -42,7 +42,7 @@ endfunction
 
 function! sidebar#toggle(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in s:find_windows_at_position(s:sidebars[a:name].position)
+    for [found_nr, found_name] in items(s:find_windows_at_position(s:sidebars[a:name].position))
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
