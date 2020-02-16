@@ -67,9 +67,8 @@ Notes:
 
 - `vim-sidebar-manager` does not actually move your windows or change your
   windows' sizes. The `position` field in the argument of `sidebar#register()`
-  function is only a flag for the manager to recognize. If you want them to
-  open at the same side, you have to adjust the individual plugins'
-  configurations.
+  function is only a flag for recognition. If you want them to open at the
+  same side, you have to adjust the individual plugins' configurations.
 
 - The `check_nr` field must be a Funcref who takes the `winnr` as an argument
   and returns a boolean (number) to indicate whether or not the window
