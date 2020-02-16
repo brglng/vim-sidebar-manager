@@ -1,1 +1,1 @@
-# vim-sidebar-toggles
+# vim-sidebar-manager
