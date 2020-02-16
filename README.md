@@ -15,11 +15,12 @@ at the same side, they can open simultaneously, and we have to control each of
 them individually. I think a better approach would be to "switch" them. That
 is, when I switch to NERDTree, Tagbar is closed at the same time, and when I
 switch to Tagbar, NERDTree is closed at the same time. As a result, it gives
-you a feeling that there is always a bar at a side, which have several pages
-that can be switched. That's pretty much like a usual UI layout of an IDE.
-What's more, I want to use the same key for switching and toggling. I wrote a
-lot of code to implement this behavior in the past years, and finally I found
-I can make an abstraction layer, and that's this plugin,.
+you a feeling that there is always a bar at a side, where there are several
+pages that can be switched to each other. That's pretty much like a typical
+UI layout of an IDE.  What's more, I want to use the same key for switching
+and toggling. I wrote a lot of code to implement this behavior in the past
+years, and finally noticed that I can make an abstraction layer, and that's
+this plugin.
 
 ## Example
 
