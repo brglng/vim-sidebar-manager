@@ -1,5 +1,20 @@
+let s:redraw_timeout = get(g:, 'sidebar_redraw_timeout', '30m')
+
 let s:sidebars = {}
 let s:position_name_map = {'left': [], 'bottom': [], 'top': [], 'right': []}
+
+function! s:call_or_exec(func_or_cmd)
+    if type(a:func_or_cmd) is v:t_func
+        call call(a:func_or_cmd, [])
+    else
+        call execute(a:func_or_cmd)
+    endif
+endfunction
+
+function! s:redraw_and_sleep()
+    redraw
+    execute 'sleep ' . s:redraw_timeout
+endfunction
 
 function! s:find_windows_at_position(position)
     let found_nr_name_map = {}
@@ -20,40 +35,49 @@ endfunction
 
 function! sidebar#switch(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in items(s:find_windows_at_position(s:sidebars[a:name].position))
+    let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
+    for [found_nr, found_name] in items(found_wins)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call call(s:sidebars[found_name].close, [])
-            redraw
+            call s:call_or_exec(s:sidebars[found_name].close)
         endif
     endfor
+
+    call s:redraw_and_sleep()
 
     if found_desired_nr > 0
         execute found_desired_nr . 'wincmd w'
     else
-        call call(s:sidebars[a:name].open, [])
+        call s:call_or_exec(s:sidebars[a:name].open)
     endif
 endfunction
 
 function! sidebar#close(name)
-    call call(s:sidebars[name].close, [])
+    let nr = 0
+    for i in range(1, winnr('$'))
+        if call(s:sidebars[a:name].check_nr, [i])
+            call s:call_or_exec(s:sidebars[a:name].close, [])
+        endif
+    endfor
 endfunction
 
 function! sidebar#toggle(name)
     let found_desired_nr = 0
-    for [found_nr, found_name] in items(s:find_windows_at_position(s:sidebars[a:name].position))
+    let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
+    for [found_nr, found_name] in items(found_wins)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call call(s:sidebars[found_name].close, [])
-            redraw
+            call s:call_or_exec(s:sidebars[found_name].close)
         endif
     endfor
 
+    call s:redraw_and_sleep()
+
     if found_desired_nr > 0
-        call call(s:sidebars[a:name].close, [])
+        call s:call_or_exec(s:sidebars[a:name].close)
     else
-        call call(s:sidebars[a:name].open, [])
+        call s:call_or_exec(s:sidebars[a:name].open)
     endif
 endfunction
