@@ -10,16 +10,16 @@ A sidebar manger for Vim/Neovim to mimic an IDE-like UI layout.
 
 We have a lot of plugins who open windows at your editor's side. I would call
 them "sidebars". Unfortunately, those plugins do no cooperate with each other.
-For example, if I have NERDTree and Tagbar installed, and configured to open
-at the same side, they can open simultaneously, and we have to control each of
-them individually. I think a better approach would be to "switch" them. That
-is, when I switch to NERDTree, Tagbar is closed at the same time, and when I
-switch to Tagbar, NERDTree is closed at the same time. As a result, it gives
+For example, if you have NERDTree and Tagbar installed, and configured to open
+at the same side, they can open simultaneously, and you have to control each
+of them individually. I think a better approach would be to "switch" them.
+That is, when you switch to NERDTree, Tagbar is closed automatically, and when
+you switch to Tagbar, NERDTree is closed automatically. As a result, it gives
 you a feeling that there is always a bar at a side, where there are several
-pages that can be switched to each other. That's pretty much like a typical
+pages that can be switched back and forth. That's pretty much like a typical
 UI layout of an IDE.  What's more, I want to use the same key for switching
 and toggling. I wrote a lot of code to implement this behavior in the past
-years, and finally noticed that I can make an abstraction layer, and that's
+years, and finally noticed that an abstraction layer can be made, and that's
 this plugin.
 
 ## Example
@@ -69,7 +69,7 @@ noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
 
 Notes:
 
-- `vim-sidebar-manager` does not actually move your windows or change your
+- `vim-sidebar-manager` **does not** actually move your windows or change your
   windows' sizes. The `position` field in the argument of `sidebar#register()`
   function is only a flag for recognition. If you want them to open at the
   same side, you have to adjust the individual plugins' configurations.
