@@ -4,7 +4,7 @@ A sidebar manger for Vim/Neovim to mimic an IDE-like UI layout.
 
 ## TL;DR
 
-![Screencast](https://github.com/brglng/images/raw/master/vim-sidebar-manager/screencast.gif)
+![Screencast](https://github.com/brglng/images/raw/master/vim-sidebar-manager/screencast.webp)
 
 ## Motivation
 
