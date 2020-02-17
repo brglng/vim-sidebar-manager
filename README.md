@@ -38,29 +38,26 @@ let g:tagbar_autofocus = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_SplitWidth = 40
 
-call sidebar#register({
-  \ 'name': 'nerdtree',
-  \ 'position': 'left',
-  \ 'check_nr': {nr -> getwinvar(nr, '&filetype') ==# 'nerdtree'},
-  \ 'open': 'NERDTree',
-  \ 'close': 'NERDTreeClose'
-  \})
-
-call sidebar#register({
-  \ 'name': 'tagbar',
-  \ 'position': 'left',
-  \ 'check_nr': {nr -> bufname(winbufnr(nr)) =~ '__Tagbar__'},
-  \ 'open': 'TagbarOpen',
-  \ 'close': 'TagbarClose'
-  \ })
-
-call sidebar#register({
-  \ 'name': 'undotree',
-  \ 'position': 'left',
-  \ 'check_nr': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
-  \ 'open': 'UndotreeShow',
-  \ 'close': 'UndotreeHide'
-  \ })
+let g:sidebars = {
+  \ 'nerdtree': {
+  \     'position': 'left',
+  \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'nerdtree'},
+  \     'open': 'NERDTree',
+  \     'close': 'NERDTreeClose'
+  \ },
+  \ 'tagbar': {
+  \     'position': 'left',
+  \     'check_win': {nr -> bufname(winbufnr(nr)) =~ '__Tagbar__'},
+  \     'open': 'TagbarOpen',
+  \     'close': 'TagbarClose'
+  \ },
+  \ 'undotree': {
+  \     'position': 'left',
+  \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
+  \     'open': 'UndotreeShow',
+  \     'close': 'UndotreeHide'
+  \ }
+  \ }
 
 noremap <silent> <M-1> :call sidebar#toggle('nerdtree')<CR>
 noremap <silent> <M-2> :call sidebar#toggle('tagbar')<CR>
@@ -69,15 +66,14 @@ noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
 
 Notes:
 
-- `vim-sidebar-manager` **does not** actually move your windows or change your
-  windows' sizes. The `position` field in the argument of `sidebar#register()`
-  function is only a flag for recognition. If you want them to open at the
-  same side, you have to adjust the individual plugins' configurations.
+- `vim-sidebar-manager` _does not_ actually move your windows or change your
+  windows' sizes. The `position` field in each sidebar description is only a
+  flag for recognition. If you want them to open at the same side, you have to
+  adjust the individual plugins' configurations.
 
-- The `check_nr` field must be a Funcref who takes the `winnr` as an argument
+- The `check_win` field must be a Funcref who takes the `winnr` as an argument
   and returns a boolean (number) to indicate whether or not the window
-  corresponding to this `nr` is the kind of sidebar window that you are
-  registering.
+  corresponding to this `nr` is the specific kind of sidebar window .
 
 - The `open` and `close` fields can be either a string of command or a
   Funcref.

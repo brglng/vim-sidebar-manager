@@ -3,6 +3,23 @@ let s:redraw_timeout = get(g:, 'sidebar_redraw_timeout', '30m')
 let s:sidebars = {}
 let s:position_name_map = {'left': [], 'bottom': [], 'top': [], 'right': []}
 
+function! sidebar#register(desc)
+    let s:sidebars[a:desc.name] = a:desc
+    let s:position_name_map[a:desc.position] += [a:desc.name]
+endfunction
+
+function! s:register_g_sidebars()
+    for [name, attrs] in items(g:sidebars)
+        let desc = copy(attrs)
+        let desc['name'] = name
+        call sidebar#register(desc)
+    endfor
+endfunction
+
+if exists('g:sidebars')
+    call s:register_g_sidebars()
+endif
+
 function! s:call_or_exec(func_or_cmd)
     if type(a:func_or_cmd) is v:t_func
         call call(a:func_or_cmd, [])
@@ -20,17 +37,12 @@ function! s:find_windows_at_position(position)
     let found_nr_name_map = {}
     for i in range(1, winnr('$'))
         for name in s:position_name_map[a:position]
-            if call(s:sidebars[name].check_nr, [i])
+            if call(s:sidebars[name].check_win, [i])
                 let found_nr_name_map[i] = name
             endif
         endfor
     endfor
     return found_nr_name_map
-endfunction
-
-function! sidebar#register(desc)
-    let s:sidebars[a:desc.name] = a:desc
-    let s:position_name_map[a:desc.position] += [a:desc.name]
 endfunction
 
 function! sidebar#switch(name)
@@ -56,7 +68,7 @@ endfunction
 function! sidebar#close(name)
     let nr = 0
     for i in range(1, winnr('$'))
-        if call(s:sidebars[a:name].check_nr, [i])
+        if call(s:sidebars[a:name].check_win, [i])
             call s:call_or_exec(s:sidebars[a:name].close, [])
         endif
     endfor
