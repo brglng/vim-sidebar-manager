@@ -157,7 +157,7 @@ function! sidebar#close_tab_on_closing_last_buffer(wid)
             endif
         endfor
 
-        if num_non_sidebar_wins == 1 && last_buffer_winnr == win_id2win(wid)
+        if num_non_sidebar_wins == 1 && last_buffer_winnr == win_id2win(a:wid)
             try
                 confirm tabclose
             catch /E784:/
