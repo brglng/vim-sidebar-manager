@@ -12,7 +12,7 @@ command! -nargs=1 SidebarClose call sidebar#close(<q-args>)
 
 augroup sidebar
 autocmd!
-autocmd WinClosed * call sidebar#close_tab_if_no_editing_window()
+autocmd WinClosed * call sidebar#close_tab_on_closing_last_buffer(expand('<afile>'))
 augroup END
 
 let s:save_cpo = &cpo

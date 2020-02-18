@@ -146,16 +146,18 @@ function! s:is_sidebar(nr)
     return v:false
 endfunction
 
-function! sidebar#close_tab_if_no_editing_window()
-    if get(g:, 'sidebar_close_tab_if_no_editing_window', 0)
-        let num_editing_wins = 0
+function! sidebar#close_tab_on_closing_last_buffer(wid)
+    if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
+        let num_non_sidebar_wins = 0
+        let last_buffer_winnr = 0
         for i in range(1, winnr('$'))
             if !s:is_sidebar(i)
-                let num_editing_wins += 1
+                let num_non_sidebar_wins += 1
+                let last_buffer_winnr = i
             endif
         endfor
 
-        if num_editing_wins == 1
+        if num_non_sidebar_wins == 1 && last_buffer_winnr == win_id2win(wid)
             try
                 confirm tabclose
             catch /E784:/
