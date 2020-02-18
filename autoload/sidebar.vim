@@ -57,11 +57,11 @@ function! s:win_restore_view()
 endfunction
 
 function! s:save_view()
-    noautocmd windo call w:win_save_view()
+    noautocmd windo call <SID>win_save_view()
 endfunction
 
 function! s:restore_view()
-    noautocmd windo call w:win_restore_view()
+    noautocmd windo call <SID>win_restore_view()
 endfunction
 
 function! sidebar#switch(name)
