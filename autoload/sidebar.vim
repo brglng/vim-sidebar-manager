@@ -45,7 +45,27 @@ function! s:find_windows_at_position(position)
     return found_nr_name_map
 endfunction
 
+function! s:win_save_view()
+    let w:__sidebar_view__ = winsaveview()
+endfunction
+
+function! s:win_restore_view()
+    if exists('w:__sidebar_view__')
+        call winrestview(w:__sidebar_view__)
+        unlet w:__sidebar_view__
+    endif
+endfunction
+
+function! s:save_view()
+    noautocmd windo call w:win_save_view()
+endfunction
+
+function! s:restore_view()
+    noautocmd windo call w:win_restore_view()
+endfunction
+
 function! sidebar#switch(name)
+    call s:save_view()
     let found_desired_nr = 0
     let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
     for [found_nr, found_name] in items(found_wins)
@@ -63,18 +83,22 @@ function! sidebar#switch(name)
     else
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
+    call s:restore_view()
 endfunction
 
 function! sidebar#close(name)
+    call s:save_view()
     let nr = 0
     for i in range(1, winnr('$'))
         if call(s:sidebars[a:name].check_win, [i])
             call s:call_or_exec(s:sidebars[a:name].close, [])
         endif
     endfor
+    call s:restore_view()
 endfunction
 
 function! sidebar#toggle(name)
+    call s:save_view()
     let found_desired_nr = 0
     let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
     for [found_nr, found_name] in items(found_wins)
@@ -92,18 +116,23 @@ function! sidebar#toggle(name)
     else
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
+    call s:restore_view()
 endfunction
 
 function! sidebar#close_side(position)
+    call s:save_view()
     for name in s:position_name_map[a:position]
         call call(s:sidebars[name].close, [])
     endfor
+    call s:restore_view()
     redraw
 endfunction
 
 function! sidebar#close_all()
+    call s:save_view()
     for [name, desc] in s:sidebars
         call call(desc.close, [])
     endfor
+    call s:restore_view()
     redraw
 endfunction
