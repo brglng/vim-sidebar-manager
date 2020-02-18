@@ -93,3 +93,17 @@ function! sidebar#toggle(name)
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
 endfunction
+
+function! sidebar#close_side(position)
+    for name in s:position_name_map[a:position]
+        call call(s:sidebars[name].close, [])
+    endfor
+    redraw
+endfunction
+
+function! sidebar#close_all()
+    for [name, desc] in s:sidebars
+        call call(desc.close, [])
+    endfor
+    redraw
+endfunction
