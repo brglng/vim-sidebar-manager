@@ -130,9 +130,37 @@ endfunction
 
 function! sidebar#close_all()
     call s:save_view()
-    for [name, desc] in s:sidebars
+    for [name, desc] in items(s:sidebars)
         call call(desc.close, [])
     endfor
     call s:restore_view()
     redraw
+endfunction
+
+function! s:is_sidebar(nr)
+    for [name, desc] in items(s:sidebars)
+        if call(desc.check_win, [a:nr])
+            return v:true
+        endif
+    endfor
+    return v:false
+endfunction
+
+function! sidebar#close_tab_if_no_editing_window()
+    if get(g:, 'sidebar_close_tab_if_no_editing_window', 0)
+        let num_editing_wins = 0
+        for i in range(1, winnr('$'))
+            if !s:is_sidebar(i)
+                let num_editing_wins += 1
+            endif
+        endfor
+
+        if num_editing_wins == 1
+            try
+                confirm tabclose
+            catch /E784:/
+                confirm qall
+            endtry
+        endif
+    endif
 endfunction
