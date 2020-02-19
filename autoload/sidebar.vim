@@ -162,23 +162,21 @@ function! s:is_sidebar(nr)
     return 0
 endfunction
 
-function! sidebar#close_tab_on_closing_last_buffer(wid)
+function! sidebar#close_tab_on_closing_last_buffer()
     if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
         let num_non_sidebar_wins = 0
-        let last_buffer_winnr = 0
         for i in range(1, winnr('$'))
             if !s:is_sidebar(i)
                 let num_non_sidebar_wins += 1
-                let last_buffer_winnr = i
             endif
         endfor
 
-        if num_non_sidebar_wins == 1 && last_buffer_winnr == win_id2win(a:wid)
-            try
+        if num_non_sidebar_wins == 0
+            if tabpagenr('$') > 1
                 confirm tabclose
-            catch /E784:/
+            else
                 confirm qall
-            endtry
+            endif
         endif
     endif
 endfunction
