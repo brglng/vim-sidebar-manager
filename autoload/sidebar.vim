@@ -72,7 +72,12 @@ function! s:wait_for_close(position)
 endfunction
 
 function! sidebar#switch(name)
-    call s:save_view()
+    let position = s:sidebars[a:name].position
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:save_view()
+    endif
+
     let found_desired_nr = 0
     let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
     for [found_nr, found_name] in items(found_wins)
@@ -89,11 +94,19 @@ function! sidebar#switch(name)
         call s:wait_for_close(s:sidebars[a:name].position)
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
-    call s:restore_view()
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:restore_view()
+    endif
 endfunction
 
 function! sidebar#close(name)
-    call s:save_view()
+    let position = s:sidebars[a:name].position
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:save_view()
+    endif
+
     if has_key(a:name, 'get_win')
         if call(s:sidebars[a:name].get_win, []) > 0
             call s:call_or_exec(s:sidebars[a:name].close, [])
@@ -106,11 +119,19 @@ function! sidebar#close(name)
             endif
         endfor
     endif
-    call s:restore_view()
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:restore_view()
+    endif
 endfunction
 
 function! sidebar#toggle(name)
-    call s:save_view()
+    let position = s:sidebars[a:name].position
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:save_view()
+    endif
+
     let found_desired_nr = 0
     let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
     for [found_nr, found_name] in items(found_wins)
@@ -127,7 +148,10 @@ function! sidebar#toggle(name)
         call s:wait_for_close(s:sidebars[a:name].position)
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
-    call s:restore_view()
+
+    if index(['top', 'bottom'], position) >= 0
+        call s:restore_view()
+    endif
 endfunction
 
 function! sidebar#close_side(position)
