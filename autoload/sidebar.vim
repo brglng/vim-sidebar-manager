@@ -1,5 +1,3 @@
-let s:redraw_timeout = get(g:, 'sidebar_redraw_timeout', '30m')
-
 let s:sidebars = {}
 let s:position_name_map = {'left': [], 'bottom': [], 'top': [], 'right': []}
 
@@ -26,11 +24,6 @@ function! s:call_or_exec(func_or_cmd)
     else
         execute a:func_or_cmd
     endif
-endfunction
-
-function! s:redraw_and_sleep()
-    redraw
-    execute 'sleep ' . s:redraw_timeout
 endfunction
 
 function! s:find_windows_at_position(position)
@@ -68,6 +61,16 @@ function! s:restore_view()
     noautocmd windo call <SID>win_restore_view()
 endfunction
 
+function! s:wait_for_close(position)
+    while 1
+        let found_wins = s:find_windows_at_position(a:position)
+        if len(found_wins) == 0
+            break
+        endif
+        sleep 10m
+    endwhile
+endfunction
+
 function! sidebar#switch(name)
     call s:save_view()
     let found_desired_nr = 0
@@ -80,11 +83,10 @@ function! sidebar#switch(name)
         endif
     endfor
 
-    call s:redraw_and_sleep()
-
     if found_desired_nr > 0
         execute found_desired_nr . 'wincmd w'
     else
+        call s:wait_for_close(s:sidebars[a:name].position)
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
     call s:restore_view()
@@ -119,11 +121,10 @@ function! sidebar#toggle(name)
         endif
     endfor
 
-    call s:redraw_and_sleep()
-
     if found_desired_nr > 0
         call s:call_or_exec(s:sidebars[a:name].close)
     else
+        call s:wait_for_close(s:sidebars[a:name].position)
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
     call s:restore_view()
@@ -135,7 +136,6 @@ function! sidebar#close_side(position)
         call call(s:sidebars[name].close, [])
     endfor
     call s:restore_view()
-    redraw
 endfunction
 
 function! sidebar#close_all()
@@ -144,7 +144,6 @@ function! sidebar#close_all()
         call call(desc.close, [])
     endfor
     call s:restore_view()
-    redraw
 endfunction
 
 function! s:is_sidebar(nr)
