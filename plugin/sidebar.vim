@@ -12,7 +12,11 @@ command! -nargs=1 SidebarClose call sidebar#close(<q-args>)
 
 augroup sidebar
 autocmd!
-autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
+
+if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
+    autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
+endif
+
 augroup END
 
 let s:save_cpo = &cpo

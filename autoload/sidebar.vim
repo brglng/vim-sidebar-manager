@@ -163,20 +163,18 @@ function! s:is_sidebar(nr)
 endfunction
 
 function! sidebar#close_tab_on_closing_last_buffer()
-    if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
-        let num_non_sidebar_wins = 0
-        for i in range(1, winnr('$'))
-            if !s:is_sidebar(i)
-                let num_non_sidebar_wins += 1
-            endif
-        endfor
+    let num_non_sidebar_wins = 0
+    for i in range(1, winnr('$'))
+        if !s:is_sidebar(i)
+            let num_non_sidebar_wins += 1
+        endif
+    endfor
 
-        if num_non_sidebar_wins == 0
-            if tabpagenr('$') > 1
-                confirm tabclose
-            else
-                confirm qall
-            endif
+    if num_non_sidebar_wins == 0
+        if tabpagenr('$') > 1
+            confirm tabclose
+        else
+            confirm qall
         endif
     endif
 endfunction
