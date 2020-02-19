@@ -37,7 +37,11 @@ function! s:find_windows_at_position(position)
     let found_nr_name_map = {}
     for i in range(1, winnr('$'))
         for name in s:position_name_map[a:position]
-            if call(s:sidebars[name].check_win, [i])
+            if has_key(s:sidebars[name], 'get_win')
+                if call(s:sidebars[name].get_win, []) == i
+                    let found_nr_name_map[i] = name
+                endif
+            elseif call(s:sidebars[name].check_win, [i])
                 let found_nr_name_map[i] = name
             endif
         endfor
@@ -88,12 +92,18 @@ endfunction
 
 function! sidebar#close(name)
     call s:save_view()
-    let nr = 0
-    for i in range(1, winnr('$'))
-        if call(s:sidebars[a:name].check_win, [i])
+    if has_key(a:name, 'get_win')
+        if call(s:sidebars[a:name].get_win, []) > 0
             call s:call_or_exec(s:sidebars[a:name].close, [])
         endif
-    endfor
+    else
+        let nr = 0
+        for i in range(1, winnr('$'))
+            if call(s:sidebars[a:name].check_win, [i])
+                call s:call_or_exec(s:sidebars[a:name].close, [])
+            endif
+        endfor
+    endif
     call s:restore_view()
 endfunction
 
@@ -139,11 +149,17 @@ endfunction
 
 function! s:is_sidebar(nr)
     for [name, desc] in items(s:sidebars)
-        if call(desc.check_win, [a:nr])
-            return v:true
+        if has_key(desc, 'get_win')
+            if call(desc.get_win, []) == a:nr
+                return 1
+            endif
+        else
+            if call(desc.check_win, [a:nr])
+                return 1
+            endif
         endif
     endfor
-    return v:false
+    return 0
 endfunction
 
 function! sidebar#close_tab_on_closing_last_buffer(wid)
