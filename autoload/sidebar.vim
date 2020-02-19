@@ -24,7 +24,7 @@ function! s:call_or_exec(func_or_cmd)
     if type(a:func_or_cmd) is v:t_func
         call call(a:func_or_cmd, [])
     else
-        call execute(a:func_or_cmd)
+        execute a:func_or_cmd
     endif
 endfunction
 
