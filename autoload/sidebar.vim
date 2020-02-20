@@ -201,3 +201,13 @@ function! sidebar#close_tab_on_closing_last_buffer()
         endif
     endif
 endfunction
+
+function! sidebar#get(...)
+    if len(a:000) == 0
+        return values(s:sidebars)
+    elseif len(a:000) == 1
+        return s:sidebars[a:1]
+    else
+        throw "only 1 argument is allowed"
+    endif
+endfunction
