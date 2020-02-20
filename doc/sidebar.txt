@@ -47,6 +47,9 @@ plugin.
 
 2.1 NERDTree, Tagbar and Undotree   *sidebar-example-nerdtree-tagbar-undotree*
 
+NERDTree: https://github.com/preservim/nerdtree
+Tagbar: https://github.com/majutsushi/tagbar
+Undotree: https://github.com/mbbill/undotree
 >
     let g:NERDTreeWinPos = 'left'
     let g:NERDTreeWinSize = 40
@@ -86,6 +89,10 @@ plugin.
                                  *sidebar-example-coc-explorer-vista-undotree*
 
 2.1 coc-explorer, Vista.vim and Undotree
+
+coc-explorer: https://github.com/weirongxu/coc-explorer
+Vista.vim: https://github.com/liuchengxu/vista.vim
+Undotree: https://github.com/mbbill/undotree
 >
     let g:vista_sidebar_position = 'vertical topleft'
     let g:vista_sidebar_width = 40
@@ -120,6 +127,8 @@ plugin.
                                    *sidebar-example-quickfix-loclist-terminal*
 
 2.2 QuickFix, Location List and Terminal
+
+vim-terminal-help: https://github.com/skywind3000/vim-terminal-help
 >
     autocmd FileType qf call s:setup_quickfix_window()
     function! s:setup_quickfix_window()
