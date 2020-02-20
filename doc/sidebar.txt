@@ -1,0 +1,297 @@
+*sidebar.txt*       The missing sidebar manager for Vim and Neovim
+*sidebar* *vim-sidebar-manager*
+
+==============================================================================
+Contents~
+
+1. Introduction                                         |sidebar-introduction|
+  1.1 Motivation                                          |sidebar-motivation|
+2. Examples                                                 |sidebar-examples|
+  2.1 NERDTree, Tagbar and Undotree |sidebar-example-nerdtree-tagbar-undotree|
+  2.1 coc-explorer, Vista.vim and Undotree
+                                 |sidebar-example-coc-explorer-vista-undotree|
+  2.2 QuickFix, Location List and Terminal
+                                   |sidebar-example-quickfix-loclist-terminal|
+3. Options                                                   |sidebar-options|
+4. Sidebar Properties                                     |sidebar-properties|
+5. Commands                                                 |sidebar-commands|
+6. Functions                                               |sidebar-functions|
+7. Credits                                                   |sidebar-credits|
+
+==============================================================================
+
+1. Introduction                                         *sidebar-introduction*
+
+|vim-sidebar-manger| is a plugin for managing "sidebar" windows in Vim and
+Neovim, in order to mimic an IDE-like UI layout.
+
+1.1 Motivation
+
+We have a lot of plugins who open windows at your editor's side. I would call
+them "sidebars". Unfortunately, those plugins do no cooperate with each other.
+For example, if you have NERDTree and Tagbar installed, and configured to open
+at the same side, they can open simultaneously, and you have to control each
+of them individually. I think a better approach would be to "switch" them.
+That is, when you switch to NERDTree, Tagbar is closed automatically, and when
+you switch to Tagbar, NERDTree is closed automatically. As a result, it gives
+you a feeling that there is always a bar at a side, where there are several
+pages that can be switched back and forth. That's pretty much like a typical
+UI layout of an IDE. What's more, I want to use the same key for switching and
+toggling. I wrote a lot of code to implement this behavior in the past years,
+and finally noticed that an abstraction layer can be made, and that's this
+plugin.
+
+==============================================================================
+
+2. Examples                                                 *sidebar-examples*
+
+2.1 NERDTree, Tagbar and Undotree   *sidebar-example-nerdtree-tagbar-undotree*
+
+>
+    let g:NERDTreeWinPos = 'left'
+    let g:NERDTreeWinSize = 40
+    let g:NERDTreeQuitOnOpen = 0
+    let g:tagbar_left = 1
+    let g:tagbar_width = 40
+    let g:tagbar_autoclose = 0
+    let g:tagbar_autofocus = 1
+    let g:undotree_SetFocusWhenToggle = 1
+    let g:undotree_SplitWidth = 40
+    
+    let g:sidebars = {
+      \ 'nerdtree': {
+      \     'position': 'left',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'nerdtree'},
+      \     'open': 'NERDTree',
+      \     'close': 'NERDTreeClose'
+      \ },
+      \ 'tagbar': {
+      \     'position': 'left',
+      \     'check_win': {nr -> bufname(winbufnr(nr)) =~ '__Tagbar__'},
+      \     'open': 'TagbarOpen',
+      \     'close': 'TagbarClose'
+      \ },
+      \ 'undotree': {
+      \     'position': 'left',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
+      \     'open': 'UndotreeShow',
+      \     'close': 'UndotreeHide'
+      \ }
+      \ }
+    
+    noremap <silent> <M-1> :call sidebar#toggle('nerdtree')<CR>
+    noremap <silent> <M-2> :call sidebar#toggle('tagbar')<CR>
+    noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
+<
+                                 *sidebar-example-coc-explorer-vista-undotree*
+
+2.1 coc-explorer, Vista.vim and Undotree
+>
+    let g:vista_sidebar_position = 'vertical topleft'
+    let g:vista_sidebar_width = 40
+    let g:undotree_SetFocusWhenToggle = 1
+    let g:undotree_SplitWidth = 40
+    
+    let g:sidebars = {
+      \ 'coc-explorer': {
+      \     'position': 'left',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'coc-explorer'},
+      \     'open': 'CocCommand explorer --no-toggle',
+      \     'close': 'CocCommand explorer --toggle'
+      \ },
+      \ 'vista': {
+      \     'position': 'left',
+      \     'check_win': {nr -> bufname(winbufnr(nr)) =~ '__vista__'},
+      \     'open': 'Vista',
+      \     'close': 'Vista!'
+      \ },
+      \ 'undotree': {
+      \     'position': 'left',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
+      \     'open': 'UndotreeShow',
+      \     'close': 'UndotreeHide'
+      \ }
+      \ }
+
+    noremap <silent> <M-1> :call sidebar#toggle('coc-explorer')<CR>
+    noremap <silent> <M-2> :call sidebar#toggle('vista')<CR>
+    noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
+<
+                                   *sidebar-example-quickfix-loclist-terminal*
+
+2.2 QuickFix, Location List and Terminal
+>
+    autocmd FileType qf call s:setup_quickfix_window()
+    function! s:setup_quickfix_window()
+        wincmd J
+        10wincmd _
+        setlocal wrap foldcolumn=0 colorcolumn= signcolumn=no cursorline
+        nnoremap <silent> <buffer> q <C-w>q
+    endfunction
+    
+    let g:sidebars = {
+      \ 'quickfix': {
+      \     'position': 'bottom',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'qf' &&
+      \                         !getwininfo(win_getid(nr))[0]['loclist']},
+      \     'open': 'copen',
+      \     'close': 'cclose'
+      \ },
+      \ 'loclist': {
+      \     'position': 'bottom',
+      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'qf' &&
+      \                         getwininfo(win_getid(nr))[0]['loclist']},
+      \     'open': 'silent! lopen',
+      \     'close': 'silent! lclose'
+      \ },
+      \ 'terminal': {
+      \     'position': 'bottom',
+      \     'get_win': {-> exists('t:__terminal_bid__') ?
+      \                    bufwinnr(t:__terminal_bid__) : 0},
+      \     'open': 'call TerminalOpen()',
+      \     'close': 'call TerminalClose()'
+      \ }
+      \ }
+    
+    noremap <silent> <M-6> :call sidebar#toggle('quickfix')<CR>
+    noremap <silent> <M-7> :call sidebar#toggle('loclist')<CR>
+    noremap <silent> <M-=> :call sidebar#toggle('terminal')<CR>
+    if has('nvim')
+        tnoremap <silent> <M-6> <C-\><C-n>:call sidebar#toggle('quickfix')<CR>
+        tnoremap <silent> <M-7> <C-\><C-n>:call sidebar#toggle('loclist')<CR>
+        tnoremap <silent> <M-=> <C-\><C-n>:call sidebar#toggle('terminal')<CR>
+    else
+        tnoremap <silent> <M-6> <C-_>:call sidebar#toggle('quickfix')<CR>
+        tnoremap <silent> <M-7> <C-_>:call sidebar#toggle('loclist')<CR>
+        tnoremap <silent> <M-=> <C-_>:call sidebar#toggle('terminal')<CR>
+    endif
+<
+==============================================================================
+
+3. Options                                                   *sidebar-options*
+
+g:sidebar                                                          *g:sidebar*
+
+    The list of sidebars to register. This variable must be a |dict|, whose key
+    is the name of the sidebar, and value is a |dict| of the properties of the
+    sidebar. Please see |sidebar-properties| for available properties.
+
+    Default: {}
+
+                                  *g:sidebar_close_tab_on_closing_last_buffer*
+
+g:sidebar_close_tab_on_closing_last_buffer
+
+    Whether or not to close the tab page when closing the last window that is
+    not a sidebar.
+
+    Default: 0
+
+==============================================================================
+
+4. Sidebar Properties                                     *sidebar-properties*
+
+position                                           *sidebar-property-position*
+
+    The position of the sidebar. Must be a |string|. Available choices are
+    `'left'`, `'bottom'`, `'top'` and `'right'`.
+
+    NOTE: |vim-sidebar-manager| does not actually move your window or change
+    your window's size. If you want to, e.g., place the |Tagbar| in the right,
+    you must adjust the options of the |Tagbar| plugin.
+
+check_win                                         *sidebar-property-check_win*
+
+    A |Funcref| who takes the window number (|winnr|) as an argument, and returns
+    a |Number| to indicate whether or not the window corresponding to the window
+    number is the sidebar window of this kind. This property is optional if
+    the get_win property is present.
+
+get_win                                             *sidebar-property-get_win*
+
+    A |Funcref| returning the window number (|winnr|) of the sidebar. This
+    property is optional if the check_win property is present. If both
+    check_win and get_win are present, get_win will take precedence.
+
+open                                                   *sidebar-property-open*
+
+    A |string| of Ex command or a |Funcref| to open the sidebar.
+
+close                                                 *sidebar-property-close*
+
+    A |string| of Ex command or a |Funcref| to close the sidebar.
+
+==============================================================================
+
+5. Commands                                                 *sidebar-commands*
+
+SidebarSwitch {name}                                           *SidebarSwitch*
+
+    Switch to the sidebar of the specified name. If the sidebar is already
+    open, the cursor will jump to the sidebar's window. If the sidebar is not
+    open, it will be opened. If there is another kind of sidebar open at the
+    same side, it will be closed.
+
+SidebarClose {name}                                             *SidebarClose*
+
+    Close the sidebar of the specified name if it is open.
+
+SidebarToggle {name}                                           *SidebarToggle*
+
+    Toggle the sidebar of the specified name. If the sidebar is already open,
+    it will be closed. If it is not open, it will be opened. If there is
+    another kind of sidebar open at same side, it will be closed.
+
+SidebarCloseSide {position}                                 *SidebarCloseSide*
+
+    Close the sidebar at {position}. The {position} can be `'left'`, `'bottom'`,
+    `'top'` or `'right'`.
+
+SidebarCloseAll                                              *SidebarCloseAll*
+
+    Close all sidebars.
+
+==============================================================================
+
+6. Functions                                               *sidebar-functions*
+
+sidebar#register({desc})                                  *sidebar#register()*
+
+    Register a sidebar. The argument {desc} must be a |dict|, with the name of
+    the sidebar as the `'name'` key, and all the properties of the sidebar.
+
+sidebar#switch({name})                                      *sidebar#switch()*
+
+    Switch to the sidebar of the specified name. If the sidebar is already
+    open, the cursor will jump to the sidebar's window. If the sidebar is not
+    open, it will be opened. If there is another kind of sidebar open at the
+    same side, it will be closed.
+
+sidebar#close({name})                                        *sidebar#close()*
+
+    Close the sidebar of the specified name if it is open.
+
+sidebar#toggle({name})                                      *sidebar#toggle()*
+
+    Toggle the sidebar of the specified name. If the sidebar is already open,
+    it will be closed. If it is not open, it will be opened. If there is
+    another kind of sidebar open at same side, it will be closed.
+
+sidebar#close_side({position})                          *sidebar#close_side()*
+
+    Close the sidebar at {position}. The {position} can be `'left'`, `'bottom'`,
+    `'top'` or `'right'`.
+
+sidebar#close_all()                                      *sidebar#close_all()*
+
+    Close all sidebars.
+
+==============================================================================
+
+7. Credits                                                   *sidebar-credits*
+
+If you like this plugin, check out the GitHub for more information at
+https://github.com/brglng/vim-sidebar-manager
+
+==============================================================================
+vim:tw=78:ts=8:et:ft=help:norl:
