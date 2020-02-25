@@ -26,18 +26,38 @@ function! s:call_or_exec(func_or_cmd)
     endif
 endfunction
 
-function! s:find_windows_at_position(position)
-    let found_nr_name_map = {}
-    for i in range(1, winnr('$'))
-        for name in s:position_name_map[a:position]
-            if has_key(s:sidebars[name], 'get_win')
-                if call(s:sidebars[name].get_win, []) == i
-                    let found_nr_name_map[i] = name
-                endif
-            elseif call(s:sidebars[name].check_win, [i])
-                let found_nr_name_map[i] = name
+function! s:get_win(name)
+    if has_key(s:sidebars[a:name], 'get_win')
+        return call(s:sidebars[a:name].get_win, [])
+    else
+        for i in range(1, winnr('$'))
+            if call(s:sidebars[a:name].check_win, [i])
+                return i
             endif
         endfor
+    endif
+    return 0
+endfunction
+
+function! s:open(name)
+    call s:call_or_exec(s:sidebars[a:name].open)
+endfunction
+
+function! s:close(name)
+    call s:call_or_exec(s:sidebars[a:name].close)
+endfunction
+
+function! s:position(name)
+    return s:sidebars[a:name].position
+endfunction
+
+function! s:find_windows_at_position(position)
+    let found_nr_name_map = {}
+    for name in s:position_name_map[a:position]
+        let win = s:get_win(name)
+        if win > 0
+            let found_nr_name_map[win] = name
+        endif
     endfor
     return found_nr_name_map
 endfunction
@@ -84,7 +104,7 @@ function! sidebar#switch(name)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call s:call_or_exec(s:sidebars[found_name].close)
+            call s:close(found_name)
         endif
     endfor
 
@@ -92,7 +112,7 @@ function! sidebar#switch(name)
         execute found_desired_nr . 'wincmd w'
     else
         call s:wait_for_close(s:sidebars[a:name].position)
-        call s:call_or_exec(s:sidebars[a:name].open)
+        call s:open(a:name)
     endif
 
     if index(['top', 'bottom'], position) >= 0
@@ -109,13 +129,13 @@ function! sidebar#close(name)
 
     if has_key(a:name, 'get_win')
         if call(s:sidebars[a:name].get_win, []) > 0
-            call s:call_or_exec(s:sidebars[a:name].close, [])
+            call s:close(a:name)
         endif
     else
         let nr = 0
         for i in range(1, winnr('$'))
             if call(s:sidebars[a:name].check_win, [i])
-                call s:call_or_exec(s:sidebars[a:name].close, [])
+                call s:close(a:name)
             endif
         endfor
     endif
@@ -138,15 +158,15 @@ function! sidebar#toggle(name)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call s:call_or_exec(s:sidebars[found_name].close)
+            call s:close(found_name)
         endif
     endfor
 
     if found_desired_nr > 0
-        call s:call_or_exec(s:sidebars[a:name].close)
+        call s:close(a:name)
     else
         call s:wait_for_close(s:sidebars[a:name].position)
-        call s:call_or_exec(s:sidebars[a:name].open)
+        call s:open(a:name)
     endif
 
     if index(['top', 'bottom'], position) >= 0
@@ -157,7 +177,9 @@ endfunction
 function! sidebar#close_side(position)
     call s:save_view()
     for name in s:position_name_map[a:position]
-        call call(s:sidebars[name].close, [])
+        if s:get_win(name) > 0
+            call s:close(name)
+        endif
     endfor
     call s:restore_view()
 endfunction
@@ -165,7 +187,9 @@ endfunction
 function! sidebar#close_all()
     call s:save_view()
     for [name, desc] in items(s:sidebars)
-        call call(desc.close, [])
+        if s:get_win(name) > 0
+            call s:close(name)
+        endif
     endfor
     call s:restore_view()
 endfunction
