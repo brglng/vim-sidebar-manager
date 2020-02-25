@@ -62,6 +62,8 @@ let g:sidebars = {
 noremap <silent> <M-1> :call sidebar#toggle('nerdtree')<CR>
 noremap <silent> <M-2> :call sidebar#toggle('tagbar')<CR>
 noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
+
+let g:startify_session_before_save = ['call sidebar#close_all()']
 ```
 
 Notes:

@@ -15,8 +15,9 @@ Contents~
 3. Options                                                   |sidebar-options|
 4. Sidebar Properties                                     |sidebar-properties|
 5. Commands                                                 |sidebar-commands|
-6. Functions                                               |sidebar-functions|
-7. Credits                                                   |sidebar-credits|
+6. Sessions                                                 |sidebar-sessions|
+7. Functions                                               |sidebar-functions|
+8. Credits                                                   |sidebar-credits|
 
 ==============================================================================
 
@@ -262,7 +263,18 @@ SidebarCloseAll                                              *SidebarCloseAll*
 
 ==============================================================================
 
-6. Functions                                               *sidebar-functions*
+6. Sessions                                                 *sidebar-sessions*
+
+If you are using |Startify|, you may want to add this line in your vimrc:
+>
+    let g:startify_session_before_save = ['call sidebar#close_all()']
+<
+This closes all sidebar windows before saving the session using the |SSave|
+command.
+
+==============================================================================
+
+7. Functions                                               *sidebar-functions*
 
 sidebar#register({desc})                                  *sidebar#register()*
 
@@ -297,7 +309,7 @@ sidebar#close_all()                                      *sidebar#close_all()*
 
 ==============================================================================
 
-7. Credits                                                   *sidebar-credits*
+8. Credits                                                   *sidebar-credits*
 
 If you like this plugin, check out the GitHub for more information at
 https://github.com/brglng/vim-sidebar-manager
