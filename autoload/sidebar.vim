@@ -194,6 +194,29 @@ function! sidebar#close_all()
     call s:restore_view()
 endfunction
 
+function! sidebar#save_session()
+    let g:sidebar_session = []
+    for [name, desc] in items(s:sidebars)
+        if s:get_win(name) > 0
+            let g:sidebar_session += [name]
+        endif
+    endfor
+    call sidebar#close_all()
+    call s:wait_for_close('left')
+    call s:wait_for_close('bottom')
+    call s:wait_for_close('top')
+    call s:wait_for_close('right')
+endfunction
+
+function! sidebar#load_session()
+    if exists('g:sidebar_session')
+        for name in g:sidebar_session
+            call s:open(name)
+        endfor
+        " unlet g:sidebar_session
+    endif
+endfunction
+
 function! s:is_sidebar(nr)
     for [name, desc] in items(s:sidebars)
         if has_key(desc, 'get_win')
