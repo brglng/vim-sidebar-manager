@@ -85,6 +85,7 @@ function! s:wait_for_close(position)
     while 1
         let found_wins = s:find_windows_at_position(a:position)
         if len(found_wins) == 0
+            sleep 10m
             break
         endif
         sleep 10m
