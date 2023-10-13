@@ -41,12 +41,13 @@ command! -nargs=1 -complete=customlist,<SID>complete_position SidebarCloseSide c
 command! -nargs=0 SidebarCloseAll call sidebar#close_all()
 
 augroup sidebar
-autocmd!
+    autocmd!
 
-if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
-    autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
-endif
+    autocmd FileType,BufWinEnter * call sidebar#close_other_windows_on_current_side()
 
+    if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
+        autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
+    endif
 augroup END
 
 let s:save_cpo = &cpo

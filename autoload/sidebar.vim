@@ -39,6 +39,17 @@ function! s:get_win(name)
     return 0
 endfunction
 
+function! s:get_sidebar_name_of_current_win()
+    for [name, attrs] in items(s:sidebars)
+        if has_key(attrs, 'get_win') && call(attrs.get_win, []) == winnr()
+            return name
+        elseif call(attrs.check_win, [winnr()])
+            return name
+        endif
+    endfor
+    return ''
+endfunction
+
 function! s:open(name)
     call s:call_or_exec(s:sidebars[a:name].open)
 endfunction
@@ -99,22 +110,22 @@ function! sidebar#switch(name)
         call s:save_view()
     endif
 
-    let found_desired_nr = 0
-    let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
-    for [found_nr, found_name] in items(found_wins)
-        if found_name ==# a:name
-            let found_desired_nr = found_nr
-        else
-            call s:close(found_name)
-        endif
-    endfor
+    " let found_desired_nr = 0
+    " let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
+    " for [found_nr, found_name] in items(found_wins)
+    "     if found_name ==# a:name
+    "         let found_desired_nr = found_nr
+    "     else
+    "         call s:close(found_name)
+    "     endif
+    " endfor
 
-    if found_desired_nr > 0
-        execute found_desired_nr . 'wincmd w'
-    else
-        call s:wait_for_close(s:sidebars[a:name].position)
+    " if found_desired_nr > 0
+    "     execute found_desired_nr . 'wincmd w'
+    " else
+    "     call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
-    endif
+    " endif
 
     if index(['top', 'bottom'], position) >= 0
         call s:restore_view()
@@ -158,15 +169,15 @@ function! sidebar#toggle(name)
     for [found_nr, found_name] in items(found_wins)
         if found_name ==# a:name
             let found_desired_nr = found_nr
-        else
-            call s:close(found_name)
+        " else
+        "     call s:close(found_name)
         endif
     endfor
 
     if found_desired_nr > 0
         call s:close(a:name)
     else
-        call s:wait_for_close(s:sidebars[a:name].position)
+        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 
@@ -183,6 +194,20 @@ function! sidebar#close_side(position)
         endif
     endfor
     call s:restore_view()
+endfunction
+
+function! sidebar#close_other_windows_on_current_side()
+    let current_name = s:get_sidebar_name_of_current_win()
+    if current_name !=# ''
+        let position = s:sidebars[current_name].position
+        call s:save_view()
+        for name in s:position_name_map[a:position]
+            if name !=# current_name && s:get_win(name) > 0
+                call s:close(name)
+            endif
+        endfor
+        call s:restore_view()
+    endif
 endfunction
 
 function! sidebar#close_all()
