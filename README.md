@@ -68,10 +68,11 @@ let g:startify_session_before_save = ['call sidebar#close_all()']
 
 Notes:
 
-- `vim-sidebar-manager` _does not_ actually move your windows or change your
-  windows' sizes. The `position` field in each sidebar description is only a
-  flag for recognition. If you want them to open at the same side, you have to
-  adjust the individual plugins' configurations.
+- `vim-sidebar-manager` is designed to be **non-intrusive**, that is, it
+  **does not** actually move your windows or change your windows' sizes.
+  The `position` field in each sidebar description is only a flag for
+  recognition. If you want them to open at the same side, you have to adjust
+  the individual plugins' configurations.
 
 - The `check_win` field must be a Funcref who takes the `winnr` as an argument
   and returns a boolean (number) to indicate whether or not the window
