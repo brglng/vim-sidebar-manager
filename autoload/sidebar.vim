@@ -20,9 +20,9 @@ endif
 
 function! s:call_or_exec(func_or_cmd)
     if exists('v:t_func') && type(a:func_or_cmd) is v:t_func
-        call call(a:func_or_cmd, [])
+        noautocmd call call(a:func_or_cmd, [])
     else
-        execute a:func_or_cmd
+        noautocmd execute a:func_or_cmd
     endif
 endfunction
 
