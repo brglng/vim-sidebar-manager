@@ -201,7 +201,7 @@ function! sidebar#close_other_windows_on_current_side()
     if current_name !=# ''
         let position = s:sidebars[current_name].position
         call s:save_view()
-        for name in s:position_name_map[a:position]
+        for name in s:position_name_map[position]
             if name !=# current_name && s:get_win(name) > 0
                 call s:close(name)
             endif
