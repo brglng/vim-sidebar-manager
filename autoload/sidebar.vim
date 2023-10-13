@@ -92,17 +92,6 @@ function! s:restore_view()
     noautocmd windo call <SID>win_restore_view()
 endfunction
 
-function! s:wait_for_close(position)
-    while 1
-        let found_wins = s:find_windows_at_position(a:position)
-        if len(found_wins) == 0
-            sleep 10m
-            break
-        endif
-        sleep 10m
-    endwhile
-endfunction
-
 function! sidebar#switch(name)
     let position = s:sidebars[a:name].position
 
@@ -110,22 +99,7 @@ function! sidebar#switch(name)
         call s:save_view()
     endif
 
-    " let found_desired_nr = 0
-    " let found_wins = s:find_windows_at_position(s:sidebars[a:name].position)
-    " for [found_nr, found_name] in items(found_wins)
-    "     if found_name ==# a:name
-    "         let found_desired_nr = found_nr
-    "     else
-    "         call s:close(found_name)
-    "     endif
-    " endfor
-
-    " if found_desired_nr > 0
-    "     execute found_desired_nr . 'wincmd w'
-    " else
-    "     call s:wait_for_close(s:sidebars[a:name].position)
-        call s:open(a:name)
-    " endif
+    call s:open(a:name)
 
     if index(['top', 'bottom'], position) >= 0
         call s:restore_view()
@@ -169,15 +143,12 @@ function! sidebar#toggle(name)
     for [found_nr, found_name] in items(found_wins)
         if found_name ==# a:name
             let found_desired_nr = found_nr
-        " else
-        "     call s:close(found_name)
         endif
     endfor
 
     if found_desired_nr > 0
         call s:close(a:name)
     else
-        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 
@@ -200,13 +171,11 @@ function! sidebar#close_other_windows_on_current_side()
     let current_name = s:get_sidebar_name_of_current_win()
     if current_name !=# ''
         let position = s:sidebars[current_name].position
-        " call s:save_view()
         for name in s:position_name_map[position]
             if name !=# current_name && s:get_win(name) > 0
                 call s:close(name)
             endif
         endfor
-        " call s:restore_view()
     endif
 endfunction
 
@@ -228,10 +197,6 @@ function! sidebar#save_session()
         endif
     endfor
     call sidebar#close_all()
-    call s:wait_for_close('left')
-    call s:wait_for_close('bottom')
-    call s:wait_for_close('top')
-    call s:wait_for_close('right')
 endfunction
 
 function! sidebar#load_session()
