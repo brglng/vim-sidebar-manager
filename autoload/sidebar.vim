@@ -40,13 +40,13 @@ function! s:get_win(name)
 endfunction
 
 function! s:open(name)
-    if s:get_win(name) == 0
+    if s:get_win(a:name) == 0
         call s:call_or_exec(s:sidebars[a:name].open)
     endif
 endfunction
 
 function! s:close(name)
-    if s:get_win(name) > 0
+    if s:get_win(a:name) > 0
         call s:call_or_exec(s:sidebars[a:name].close)
     endif
 endfunction
