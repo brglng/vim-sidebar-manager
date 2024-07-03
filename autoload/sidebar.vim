@@ -39,23 +39,16 @@ function! s:get_win(name)
     return 0
 endfunction
 
-function! s:get_sidebar_name_of_current_win()
-    for [name, attrs] in items(s:sidebars)
-        if has_key(attrs, 'get_win') && call(attrs.get_win, []) == winnr()
-            return name
-        elseif call(attrs.check_win, [winnr()])
-            return name
-        endif
-    endfor
-    return ''
-endfunction
-
 function! s:open(name)
-    call s:call_or_exec(s:sidebars[a:name].open)
+    if s:get_win(name) == 0
+        call s:call_or_exec(s:sidebars[a:name].open)
+    endif
 endfunction
 
 function! s:close(name)
-    call s:call_or_exec(s:sidebars[a:name].close)
+    if s:get_win(name) > 0
+        call s:call_or_exec(s:sidebars[a:name].close)
+    endif
 endfunction
 
 function! s:position(name)
@@ -167,8 +160,19 @@ function! sidebar#close_side(position)
     call s:restore_view()
 endfunction
 
-function! sidebar#close_other_windows_on_current_side()
-    let current_name = s:get_sidebar_name_of_current_win()
+function! sidebar#get_sidebar_name_of_current_win()
+    for [name, attrs] in items(s:sidebars)
+        if has_key(attrs, 'get_win') && call(attrs.get_win, []) == winnr()
+            return name
+        elseif call(attrs.check_win, [winnr()])
+            return name
+        endif
+    endfor
+    return ''
+endfunction
+
+function! sidebar#close_other_windows_on_same_side(current_name, timer)
+    let current_name = sidebar#get_sidebar_name_of_current_win()
     if current_name !=# ''
         let position = s:sidebars[current_name].position
         for name in s:position_name_map[position]

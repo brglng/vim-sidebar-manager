@@ -43,7 +43,7 @@ command! -nargs=0 SidebarCloseAll call sidebar#close_all()
 augroup sidebar
     autocmd!
 
-    autocmd FileType,BufWinEnter * call sidebar#close_other_windows_on_current_side()
+    autocmd FileType,BufWinEnter * call timer_start(0, function('sidebar#close_other_windows_on_same_side', [sidebar#get_sidebar_name_of_current_win()]))
 
     if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
         autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
