@@ -172,11 +172,11 @@ function! sidebar#get_sidebar_name_of_current_win()
 endfunction
 
 function! sidebar#close_other_windows_on_same_side(current_name, timer)
-    let current_name = sidebar#get_sidebar_name_of_current_win()
-    if current_name !=# ''
-        let position = s:sidebars[current_name].position
+    " let current_name = sidebar#get_sidebar_name_of_current_win()
+    if a:current_name !=# ''
+        let position = s:sidebars[a:current_name].position
         for name in s:position_name_map[position]
-            if name !=# current_name && s:get_win(name) > 0
+            if name !=# a:current_name && s:get_win(name) > 0
                 call s:close(name)
             endif
         endfor
