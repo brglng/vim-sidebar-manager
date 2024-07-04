@@ -26,12 +26,28 @@ function! s:call_or_exec(func_or_cmd)
     endif
 endfunction
 
+function! s:call_or_eval(func_or_expr, ...)
+    if exists('v:t_func') && type(a:func_or_expr) is v:t_func
+        if len(a:000) == 0
+            return call(a:func_or_expr, [])
+        else
+            return call(a:func_or_expr, [a:1])
+        endif
+    else
+        if len(a:000) == 0
+            return eval(a:func_or_expr)
+        else
+            return eval(a:func_or_expr . string(a:1))
+        endif
+    endif
+endfunction
+
 function! s:get_win(name)
     if has_key(s:sidebars[a:name], 'get_win')
-        return call(s:sidebars[a:name].get_win, [])
+        return s:call_or_eval(s:sidebars[a:name].get_win)
     else
         for i in range(1, winnr('$'))
-            if call(s:sidebars[a:name].check_win, [i])
+            if s:call_or_eval(s:sidebars[a:name].check_win, i)
                 return i
             endif
         endfor
@@ -133,13 +149,13 @@ function! sidebar#close(name)
     endif
 
     if has_key(a:name, 'get_win')
-        if call(s:sidebars[a:name].get_win, []) > 0
+        if s:call_or_eval(s:sidebars[a:name].get_win) > 0
             call s:close(a:name)
         endif
     else
         let nr = 0
         for i in range(1, winnr('$'))
-            if call(s:sidebars[a:name].check_win, [i])
+            if s:call_or_eval(s:sidebars[a:name].check_win, i)
                 call s:close(a:name)
             endif
         endfor
@@ -225,11 +241,11 @@ endfunction
 function! s:is_sidebar(nr)
     for [name, desc] in items(s:sidebars)
         if has_key(desc, 'get_win')
-            if call(desc.get_win, []) == a:nr
+            if s:call_or_eval(desc.get_win) == a:nr
                 return 1
             endif
         else
-            if call(desc.check_win, [a:nr])
+            if s:call_or_eval(desc.check_win, a:nr)
                 return 1
             endif
         endif
