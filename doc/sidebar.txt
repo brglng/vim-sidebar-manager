@@ -219,9 +219,9 @@ check_win                                         *sidebar-property-check_win*
 
 get_win                                             *sidebar-property-get_win*
 
-    A |Funcref| returning the window number (|winnr|) of the sidebar. This
-    property is optional if the check_win property is present. If both
-    `check_win` and `get_win` are present, `get_win` will take precedence.
+    A |Funcref| or |string| expression returning the window number (|winnr|) of the
+    sidebar. This property is optional if the `check_win` property is present. If
+    both `check_win` and `get_win` are present, `get_win` will take precedence.
 
 open                                                   *sidebar-property-open*
 

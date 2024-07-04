@@ -26,19 +26,11 @@ function! s:call_or_exec(func_or_cmd)
     endif
 endfunction
 
-function! s:call_or_eval(func_or_expr, ...)
+function! s:call_or_eval(func_or_expr)
     if exists('v:t_func') && type(a:func_or_expr) is v:t_func
-        if len(a:000) == 0
-            return call(a:func_or_expr, [])
-        else
-            return call(a:func_or_expr, [a:1])
-        endif
+        return call(a:func_or_expr, [])
     else
-        if len(a:000) == 0
-            return eval(a:func_or_expr)
-        else
-            return eval(a:func_or_expr . string(a:1))
-        endif
+        return eval(a:func_or_expr)
     endif
 endfunction
 
@@ -47,7 +39,7 @@ function! s:get_win(name)
         return s:call_or_eval(s:sidebars[a:name].get_win)
     else
         for i in range(1, winnr('$'))
-            if s:call_or_eval(s:sidebars[a:name].check_win, i)
+            if call(s:sidebars[a:name].check_win, [i])
                 return i
             endif
         endfor
@@ -155,7 +147,7 @@ function! sidebar#close(name)
     else
         let nr = 0
         for i in range(1, winnr('$'))
-            if s:call_or_eval(s:sidebars[a:name].check_win, i)
+            if call(s:sidebars[a:name].check_win, [i])
                 call s:close(a:name)
             endif
         endfor
@@ -245,7 +237,7 @@ function! s:is_sidebar(nr)
                 return 1
             endif
         else
-            if s:call_or_eval(desc.check_win, a:nr)
+            if call(desc.check_win, [a:nr])
                 return 1
             endif
         endif
