@@ -55,6 +55,21 @@ function! s:close(name)
     call s:call_or_exec(s:sidebars[a:name].close)
 endfunction
 
+function! s:dont_close(prev, next)
+    if has_key(s:sidebars[a:next], 'dont_close')
+        if type(s:sidebars[a:next].dont_close) is v:t_string
+            return match(a:prev, s:sidebars[a:next].dont_close) >= 0
+        elseif type(s:sidebars[a:next].dont_close) is v:t_list
+            for pattern in s:sidebars[a:next].dont_close
+                if match(a:prev, pattern) >= 0
+                    return v:true
+                endif
+            endfor
+        endif
+    endif
+    return v:false
+endfunction
+
 function! s:position(name)
     return s:sidebars[a:name].position
 endfunction
@@ -113,14 +128,16 @@ function! sidebar#switch(name)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call s:close(found_name)
+            if !s:dont_close(found_name, a:name)
+                call s:close(found_name)
+            endif
         endif
     endfor
 
     if found_desired_nr > 0
         execute found_desired_nr . 'wincmd w'
     else
-        call s:wait_for_close(s:sidebars[a:name].position)
+        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 
@@ -171,14 +188,16 @@ function! sidebar#toggle(name)
         if found_name ==# a:name
             let found_desired_nr = found_nr
         else
-            call s:close(found_name)
+            if !s:dont_close(found_name, a:name)
+                call s:close(found_name)
+            endif
         endif
     endfor
 
     if found_desired_nr > 0
         call s:close(a:name)
     else
-        call s:wait_for_close(s:sidebars[a:name].position)
+        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 

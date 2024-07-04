@@ -223,6 +223,34 @@ get_win                                             *sidebar-property-get_win*
     sidebar. This property is optional if the `check_win` property is present. If
     both `check_win` and `get_win` are present, `get_win` will take precedence.
 
+dont_close                                       *sidebar-property-dont_close*
+
+    A |string| or |list| of |string|s, where each item is a pattern, against whom to
+    be matched the name of open sidebar windows. The matched windows won't be
+    closed before switching to this sidebar window. This property is useful
+    when a plugin already provides page-like switching.
+
+    e.g., It is not necessary to close the neo-tree.nvim window when switching
+    between its "Files" and "Symbols" pages. This can be achieved with this
+    property:
+>vim
+    let g:sidebars = {
+    \ 'neo-tree-filesystem': {
+    \     'position': 'left',
+    \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'neo-tree' && winbufnr(nr)->getbufvar('neo_tree_source') ==# 'filesystem'},
+    \     'open': 'Neotree filesystem reveal',
+    \     'close': 'Neotree close',
+    \     'dont_close': 'neo-tree-.*'
+    \ },
+    \ 'neo-tree-document-symbols': {
+    \     'position': 'left',
+    \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'neo-tree' && winbufnr(nr)->getbufvar('neo_tree_source') ==# 'document_symbols'},
+    \     'open': 'Neotree document_symbols reveal',
+    \     'close': 'Neotree close',
+    \     'dont_close': 'neo-tree-.*'
+    \ }
+    \ }
+<
 open                                                   *sidebar-property-open*
 
     A |string| of Ex command or a |Funcref| to open the sidebar.
