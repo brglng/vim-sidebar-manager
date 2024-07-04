@@ -34,6 +34,7 @@ function! s:complete_position(arg_lead, cmd_line, cursor_pos)
     return all_positions
 endfunction
 
+command! -nargs=1 -complete=customlist,<SID>complete_sidebar_name SidebarOpen call sidebar#open(<q-args>)
 command! -nargs=1 -complete=customlist,<SID>complete_sidebar_name SidebarSwitch call sidebar#switch(<q-args>)
 command! -nargs=1 -complete=customlist,<SID>complete_sidebar_name SidebarToggle call sidebar#toggle(<q-args>)
 command! -nargs=1 -complete=customlist,<SID>complete_sidebar_name SidebarClose call sidebar#close(<q-args>)

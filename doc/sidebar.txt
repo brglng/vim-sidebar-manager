@@ -242,6 +242,10 @@ SidebarSwitch {name}                                           *SidebarSwitch*
     open, it will be opened. If there is another kind of sidebar open at the
     same side, it will be closed.
 
+SidebarOpen {name}                                               *SidebarOpen*
+
+    Same as |SidebarSwitch|.
+
 SidebarClose {name}                                             *SidebarClose*
 
     Close the sidebar of the specified name if it is open.
@@ -287,6 +291,10 @@ sidebar#switch({name})                                      *sidebar#switch()*
     open, the cursor will jump to the sidebar's window. If the sidebar is not
     open, it will be opened. If there is another kind of sidebar open at the
     same side, it will be closed.
+
+sidebar#open({name})                                          *sidebar#open()*
+
+    Same as |sidebar#switch()|.
 
 sidebar#close({name})                                        *sidebar#close()*
 

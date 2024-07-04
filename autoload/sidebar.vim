@@ -121,6 +121,10 @@ function! sidebar#switch(name)
     endif
 endfunction
 
+function! sidebar#open(name)
+    return sidebar#switch(a:name)
+endfunction
+
 function! sidebar#close(name)
     let position = s:sidebars[a:name].position
 
