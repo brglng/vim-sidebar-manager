@@ -318,11 +318,9 @@ sidebar#close_side_except({position}, {name})    *sidebar#close_side_except()*
 
     e.g
     >vim
-    function! My_gO()
-        call sidebar#close_side_except('bottom', 'loclist')
-        return 'gO'
-    endfunction
-    nnoremap <expr> gO My_gO()
+    autocmd BufWinEnter * if &l:buftype ==# 'help' |
+    \ execute "nnoremap <buffer> <silent> gO :call sidebar#close_side_except('bottom', 'loclist')<CR>" . maparg('gO', 'n') |
+    \ endif
 
 sidebar#close_all()                                      *sidebar#close_all()*
 
