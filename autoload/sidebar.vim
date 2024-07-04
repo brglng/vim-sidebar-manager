@@ -197,6 +197,16 @@ function! sidebar#close_side(position)
     call s:restore_view()
 endfunction
 
+function! sidebar#close_side_except(position, name)
+    call s:save_view()
+    for name in s:position_name_map[a:position]
+        if name !=# a:name && s:get_win(name) > 0
+            call s:close(name)
+        endif
+    endfor
+    call s:restore_view()
+endfunction
+
 function! sidebar#close_all()
     call s:save_view()
     for [name, desc] in items(s:sidebars)

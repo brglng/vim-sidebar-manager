@@ -51,7 +51,7 @@ plugin.
 NERDTree: https://github.com/preservim/nerdtree
 Tagbar: https://github.com/majutsushi/tagbar
 Undotree: https://github.com/mbbill/undotree
->
+    >vim
     let g:NERDTreeWinPos = 'left'
     let g:NERDTreeWinSize = 40
     let g:NERDTreeQuitOnOpen = 0
@@ -94,7 +94,7 @@ Undotree: https://github.com/mbbill/undotree
 coc-explorer: https://github.com/weirongxu/coc-explorer
 Vista.vim: https://github.com/liuchengxu/vista.vim
 Undotree: https://github.com/mbbill/undotree
->
+    >vim
     let g:vista_sidebar_position = 'vertical topleft'
     let g:vista_sidebar_width = 40
     let g:undotree_SetFocusWhenToggle = 1
@@ -130,7 +130,7 @@ Undotree: https://github.com/mbbill/undotree
 2.2 QuickFix, Location List and Terminal
 
 vim-terminal-help: https://github.com/skywind3000/vim-terminal-help
->
+    >vim
     autocmd FileType qf call s:setup_quickfix_window()
     function! s:setup_quickfix_window()
         wincmd J
@@ -270,7 +270,7 @@ SidebarCloseAll                                              *SidebarCloseAll*
 6. Sessions                                                 *sidebar-sessions*
 
 If you are using |Startify|, you may want to add this line in your vimrc:
->
+    >vim
     let g:startify_session_before_save = ['call sidebar#close_all()']
 <
 This closes all sidebar windows before saving the session using the |SSave|
@@ -310,6 +310,19 @@ sidebar#close_side({position})                          *sidebar#close_side()*
 
     Close the sidebar at {position}. The {position} can be `'left'`, `'bottom'`,
     `'top'` or `'right'`.
+
+sidebar#close_side_except({position}, {name})    *sidebar#close_side_except()*
+
+    Close all sidebar windows at {position}, execept the one named {name}.
+    This function can be useful when overriding some built-in key mappings.
+
+    e.g
+    >vim
+    function! My_gO()
+        call sidebar#close_side_except('bottom', 'loclist')
+        return 'gO'
+    endfunction
+    nnoremap <expr> gO My_gO()
 
 sidebar#close_all()                                      *sidebar#close_all()*
 
