@@ -40,10 +40,17 @@ command! -nargs=1 -complete=customlist,<SID>complete_sidebar_name SidebarClose c
 command! -nargs=1 -complete=customlist,<SID>complete_position SidebarCloseSide call sidebar#close_side(<q-args>)
 command! -nargs=0 SidebarCloseAll call sidebar#close_all()
 
+function! s:close_other_windows_on_current_side()
+    let name = sidebar#get_sidebar_name_of_current_win()
+    if name !=# ''
+        call timer_start(100, function('sidebar#close_other_windows_on_same_side', [name]))
+    endif
+endfunction
+
 augroup sidebar
     autocmd!
 
-    autocmd FileType,BufWinEnter * call timer_start(0, function('sidebar#close_other_windows_on_same_side', [sidebar#get_sidebar_name_of_current_win()]))
+    autocmd FileType,BufWinEnter * call s:close_other_windows_on_current_side()
 
     if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
         autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()

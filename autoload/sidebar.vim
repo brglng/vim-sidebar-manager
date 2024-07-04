@@ -20,9 +20,9 @@ endif
 
 function! s:call_or_exec(func_or_cmd)
     if exists('v:t_func') && type(a:func_or_cmd) is v:t_func
-        noautocmd call call(a:func_or_cmd, [])
+        call call(a:func_or_cmd, [])
     else
-        noautocmd execute a:func_or_cmd
+        execute a:func_or_cmd
     endif
 endfunction
 
@@ -39,16 +39,21 @@ function! s:get_win(name)
     return 0
 endfunction
 
+function! s:has_non_sidebar_windows()
+    for i in range(1, winnr('$'))
+        if !s:is_sidebar(i)
+            return v:true
+        endif
+    endfor
+    return v:false
+endfunction
+
 function! s:open(name)
-    if s:get_win(a:name) == 0
-        call s:call_or_exec(s:sidebars[a:name].open)
-    endif
+    call s:call_or_exec(s:sidebars[a:name].open)
 endfunction
 
 function! s:close(name)
-    if s:get_win(a:name) > 0
-        call s:call_or_exec(s:sidebars[a:name].close)
-    endif
+    noautocmd call s:call_or_exec(s:sidebars[a:name].close)
 endfunction
 
 function! s:position(name)
@@ -67,22 +72,22 @@ function! s:find_windows_at_position(position)
 endfunction
 
 function! s:win_save_view()
-    let w:__sidebar_view__ = winsaveview()
+    " let w:__sidebar_view__ = winsaveview()
 endfunction
 
 function! s:win_restore_view()
-    if exists('w:__sidebar_view__')
-        call winrestview(w:__sidebar_view__)
-        unlet w:__sidebar_view__
-    endif
+    " if exists('w:__sidebar_view__')
+    "     call winrestview(w:__sidebar_view__)
+    "     unlet w:__sidebar_view__
+    " endif
 endfunction
 
 function! s:save_view()
-    noautocmd windo call <SID>win_save_view()
+    " noautocmd windo call <SID>win_save_view()
 endfunction
 
 function! s:restore_view()
-    noautocmd windo call <SID>win_restore_view()
+    " noautocmd windo call <SID>win_restore_view()
 endfunction
 
 function! sidebar#switch(name)
@@ -172,7 +177,6 @@ function! sidebar#get_sidebar_name_of_current_win()
 endfunction
 
 function! sidebar#close_other_windows_on_same_side(current_name, timer)
-    " let current_name = sidebar#get_sidebar_name_of_current_win()
     if a:current_name !=# ''
         let position = s:sidebars[a:current_name].position
         for name in s:position_name_map[position]
@@ -228,14 +232,7 @@ function! s:is_sidebar(nr)
 endfunction
 
 function! sidebar#close_tab_on_closing_last_buffer()
-    let num_non_sidebar_wins = 0
-    for i in range(1, winnr('$'))
-        if !s:is_sidebar(i)
-            let num_non_sidebar_wins += 1
-        endif
-    endfor
-
-    if num_non_sidebar_wins == 0
+    if !s:has_non_sidebar_windows()
         if tabpagenr('$') > 1
             confirm tabclose
         else
