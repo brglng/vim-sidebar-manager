@@ -235,20 +235,26 @@ dont_close                                       *sidebar-property-dont_close*
     property:
 >vim
     let g:sidebars = {
-    \ 'neo-tree-filesystem': {
-    \     'position': 'left',
-    \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'neo-tree' && winbufnr(nr)->getbufvar('neo_tree_source') ==# 'filesystem'},
-    \     'open': 'Neotree filesystem reveal',
-    \     'close': 'Neotree close',
-    \     'dont_close': 'neo-tree-.*'
-    \ },
-    \ 'neo-tree-document-symbols': {
-    \     'position': 'left',
-    \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'neo-tree' && winbufnr(nr)->getbufvar('neo_tree_source') ==# 'document_symbols'},
-    \     'open': 'Neotree document_symbols reveal',
-    \     'close': 'Neotree close',
-    \     'dont_close': 'neo-tree-.*'
-    \ }
+    \   'neo-tree-filesystem': {
+    \       'position': 'left',
+    \       'check_win': {nr ->
+    \           getwinvar(nr, '&filetype') ==# 'neo-tree' &&
+    \           winbufnr(nr)->getbufvar('neo_tree_source') ==# 'filesystem'
+    \       },
+    \       'open': 'Neotree filesystem reveal',
+    \       'close': 'Neotree close',
+    \       'dont_close': 'neo-tree-.*'
+    \   },
+    \   'neo-tree-document-symbols': {
+    \       'position': 'left',
+    \       'check_win': {nr ->
+    \           getwinvar(nr, '&filetype') ==# 'neo-tree' &&
+    \           winbufnr(nr)->getbufvar('neo_tree_source') ==# 'document_symbols'
+    \       },
+    \       'open': 'Neotree document_symbols reveal',
+    \       'close': 'Neotree close',
+    \       'dont_close': 'neo-tree-.*'
+    \   }
     \ }
 <
 open                                                   *sidebar-property-open*
@@ -344,7 +350,7 @@ sidebar#close_side_except({position}, {name})    *sidebar#close_side_except()*
     Close all sidebar windows at {position}, execept the one named {name}.
     This function can be useful when overriding some built-in key mappings.
 
-    e.g
+    e.g., The following script remaps the gO command in help windows.
     >vim
     autocmd BufWinEnter * if &l:buftype ==# 'help' |
     \ execute "nnoremap <buffer> <silent> gO :call sidebar#close_side_except('bottom', 'loclist')<CR>" . maparg('gO', 'n') |
