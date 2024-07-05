@@ -85,24 +85,33 @@ function! s:find_windows_at_position(position)
     return found_nr_name_map
 endfunction
 
-function! s:win_save_view()
-    let w:__sidebar_view__ = winsaveview()
-endfunction
+if exists('&splitkeep')
+    function! s:win_save_view()
+        let w:__sidebar_view__ = winsaveview()
+    endfunction
 
-function! s:win_restore_view()
-    if exists('w:__sidebar_view__')
-        call winrestview(w:__sidebar_view__)
-        unlet w:__sidebar_view__
-    endif
-endfunction
+    function! s:win_restore_view()
+        if exists('w:__sidebar_view__')
+            call winrestview(w:__sidebar_view__)
+            unlet w:__sidebar_view__
+        endif
+    endfunction
 
-function! s:save_view()
-    noautocmd windo call <SID>win_save_view()
-endfunction
+    function! s:save_view()
+        noautocmd windo call <SID>win_save_view()
+    endfunction
 
-function! s:restore_view()
-    noautocmd windo call <SID>win_restore_view()
-endfunction
+    function! s:restore_view()
+        noautocmd windo call <SID>win_restore_view()
+    endfunction
+else
+    function! s:save_view()
+    endfunction
+
+    function! s:restore_view()
+    endfunction
+endif
+
 
 function! s:wait_for_close(position)
     while 1
