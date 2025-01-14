@@ -1,5 +1,5 @@
 let s:sidebars = {}
-let s:position_name_map = {'left': [], 'bottom': [], 'top': [], 'right': []}
+let s:position_name_map = {'left': [], 'right': [], 'top': [], 'bottom': []}
 
 function! sidebar#register(desc)
     let s:sidebars[a:desc.name] = a:desc
@@ -7,16 +7,22 @@ function! sidebar#register(desc)
 endfunction
 
 function! s:register_g_sidebars()
-    for [name, attrs] in items(g:sidebars)
-        let desc = copy(attrs)
-        let desc['name'] = name
-        call sidebar#register(desc)
-    endfor
+    if exists('g:sidebar')
+        for [name, attrs] in items(g:sidebar)
+            let desc = copy(attrs)
+            let desc['name'] = name
+            call sidebar#register(desc)
+        endfor
+    elseif exists('g:sidebars')
+        for [name, attrs] in items(g:sidebars)
+            let desc = copy(attrs)
+            let desc['name'] = name
+            call sidebar#register(desc)
+        endfor
+    endif
 endfunction
 
-if exists('g:sidebars')
-    call s:register_g_sidebars()
-endif
+call s:register_g_sidebars()
 
 function! s:call_or_exec(func_or_cmd)
     if exists('v:t_func') && type(a:func_or_cmd) is v:t_func
@@ -34,12 +40,21 @@ function! s:call_or_eval(func_or_expr)
     endif
 endfunction
 
+function! s:filter_win(name, nr)
+    if has_key(s:sidebars[a:name], 'filter')
+        return call(s:sidebars[a:name].filter, [a:nr])
+    else
+        return call(s:sidebars[a:name].check_win, [a:nr])
+    endif
+    return 0
+endfunction
+
 function! s:get_win(name)
     if has_key(s:sidebars[a:name], 'get_win')
         return s:call_or_eval(s:sidebars[a:name].get_win)
     else
         for i in range(1, winnr('$'))
-            if call(s:sidebars[a:name].check_win, [i])
+            if s:filter_win(a:name, i)
                 return i
             endif
         endfor
@@ -47,12 +62,103 @@ function! s:get_win(name)
     return 0
 endfunction
 
+function! s:width(name)
+    let w = 0
+    if has_key(s:sidebars[a:name], 'width')
+        let w = s:sidebars[a:name].width
+    elseif s:sidebars[a:name].position ==# 'left'
+        let w = g:sidebar_left_width
+    elseif s:sidebars[a:name].position ==# 'right'
+        let w = g:sidebar_right_width
+    endif
+    if w < 1
+        let w = float2nr(w * &columns)
+    endif
+    return w
+endfunction
+
+function! s:height(name)
+    let h = 0
+    if has_key(s:sidebars[a:name], 'height')
+        let h = s:sidebars[a:name].height
+    elseif s:sidebars[a:name].position ==# 'top'
+        let h = g:sidebar_top_height
+    elseif s:sidebars[a:name].position ==# 'bottom'
+        let h = g:sidebar_bottom_height
+    endif
+    if h < 1
+        let h = float2nr(h * &lines)
+    endif
+    return h
+endfunction
+
+function! s:move(name)
+    if has_key(s:sidebars[a:name], 'move')
+        return s:sidebars[a:name].move
+    else
+        return g:sidebar_move
+    end
+endfunction
+
+function! s:opts(name)
+    let opts = copy(g:sidebar_opts)
+    if has_key(s:sidebars[a:name], 'opts')
+        let opts = extend(opts, s:sidebars[a:name].opts)
+    endif
+    return opts
+endfunction
+
+function! s:resize_win(name)
+    if s:sidebars[a:name].position ==# 'left' || s:sidebars[a:name].position ==# 'right'
+        execute s:width(a:name) . 'wincmd |'
+    else
+        execute s:height(a:name) . 'wincmd _'
+    endif
+endfunction
+
+function! s:setup_win(name, nr)
+    if s:move(a:name)
+        if s:sidebars[a:name].position ==# 'left'
+            execute 'wincmd H'
+        elseif s:sidebars[a:name].position ==# 'right'
+            execute 'wincmd L'
+        elseif s:sidebars[a:name].position ==# 'top'
+            execute 'wincmd K'
+        elseif s:sidebars[a:name].position ==# 'bottom'
+            execute 'wincmd J'
+        endif
+    endif
+
+    call s:resize_win(a:name)
+
+    for [opt, val] in items(s:opts(a:name))
+        if exists('&' . opt)
+            call setbufvar('%', '&' . opt, val)
+        endif
+    endfor
+
+    if maparg('q', 'n') ==# ''
+        nnoremap <buffer> <silent> q <C-w>q
+    endif
+endfunction
+
 function! s:open(name)
     call s:call_or_exec(s:sidebars[a:name].open)
+    let nr = s:get_win(a:name)
+    if winnr() != nr
+        execute nr . 'wincmd w'
+    endif
 endfunction
 
 function! s:close(name)
-    call s:call_or_exec(s:sidebars[a:name].close)
+    if has_key(s:sidebars[a:name], 'close')
+        call s:call_or_exec(s:sidebars[a:name].close)
+    else
+        let nr = s:get_win(a:name)
+        if nr > 0
+            execute nr . 'wincmd q'
+        endif
+    endif
 endfunction
 
 function! s:dont_close(prev, next)
@@ -86,6 +192,12 @@ function! s:find_windows_at_position(position)
 endfunction
 
 if exists('&splitkeep')
+    function! s:save_view()
+    endfunction
+
+    function! s:restore_view()
+    endfunction
+else
     function! s:win_save_view()
         let w:__sidebar_view__ = winsaveview()
     endfunction
@@ -104,24 +216,63 @@ if exists('&splitkeep')
     function! s:restore_view()
         noautocmd windo call <SID>win_restore_view()
     endfunction
-else
-    function! s:save_view()
-    endfunction
-
-    function! s:restore_view()
-    endfunction
 endif
 
-
-function! s:wait_for_close(position)
-    while 1
-        let found_wins = s:find_windows_at_position(a:position)
-        if len(found_wins) == 0
-            sleep 10m
-            break
+function! sidebar#is_sidebar(nr)
+    for [name, desc] in items(s:sidebars)
+        if has_key(desc, 'get_win')
+            if s:call_or_eval(desc.get_win) == a:nr
+                return 1
+            endif
+        else
+            if has_key(desc, 'filter')
+                if call(desc.filter, [a:nr])
+                    return 1
+                endif
+            else
+                if call(desc.check_win, [a:nr])
+                    return 1
+                endif
+            endif
         endif
-        sleep 10m
-    endwhile
+    endfor
+    return 0
+endfunction
+
+function! sidebar#get_current_sidebar()
+    let nr = winnr()
+    for [name, desc] in items(s:sidebars)
+        if s:get_win(name) == nr
+            return [nr, desc]
+        endif
+    endfor
+    return [0, {}]
+endfunction
+
+function! s:setup_current_sidebar_window()
+    let save_lazyredraw = &lazyredraw
+    set lazyredraw
+    let [nr, desc] = sidebar#get_current_sidebar()
+    if nr > 0
+        call s:setup_win(desc.name, nr)
+    endif
+    let &lazyredraw = save_lazyredraw
+endfunction
+
+nnoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) :call <SID>setup_current_sidebar_window()<CR>
+vnoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) :call <SID>setup_current_sidebar_window()<CR>
+snoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) <C-o>:call <SID>setup_current_sidebar_window()<CR>
+inoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) <C-o>:call <SID>setup_current_sidebar_window()<CR>
+if has('nvim')
+    tnoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) <C-\><C-o>:call <SID>setup_current_sidebar_window()<CR>
+else
+    tnoremap <silent> <Plug>(sidebar-setup-current-sidebar-window) <C-_><C-o>:call <SID>setup_current_sidebar_window()<CR>
+endif
+
+function! sidebar#setup_current_sidebar_window()
+    if sidebar#is_sidebar(winnr())
+        call feedkeys("\<Plug>(sidebar-setup-current-sidebar-window)")
+    endif
 endfunction
 
 function! sidebar#switch(name)
@@ -143,10 +294,18 @@ function! sidebar#switch(name)
         endif
     endfor
 
+    for [found_nr, found_name] in items(found_wins)
+        if found_nr == winnr()
+            wincmd p
+            break
+        endif
+    endfor
+
     if found_desired_nr > 0
-        execute found_desired_nr . 'wincmd w'
+        if winnr() != found_desired_nr
+            execute found_desired_nr . 'wincmd w'
+        endif
     else
-        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 
@@ -203,10 +362,16 @@ function! sidebar#toggle(name)
         endif
     endfor
 
+    for [found_nr, found_name] in items(found_wins)
+        if found_nr == winnr()
+            wincmd p
+            break
+        endif
+    endfor
+
     if found_desired_nr > 0
         call s:close(a:name)
     else
-        " call s:wait_for_close(s:sidebars[a:name].position)
         call s:open(a:name)
     endif
 
@@ -243,29 +408,6 @@ function! sidebar#close_all()
         endif
     endfor
     call s:restore_view()
-endfunction
-
-function! sidebar#save_session()
-    let g:sidebar_session = []
-    for [name, desc] in items(s:sidebars)
-        if s:get_win(name) > 0
-            let g:sidebar_session += [name]
-        endif
-    endfor
-    call sidebar#close_all()
-    call s:wait_for_close('left')
-    call s:wait_for_close('bottom')
-    call s:wait_for_close('top')
-    call s:wait_for_close('right')
-endfunction
-
-function! sidebar#load_session()
-    if exists('g:sidebar_session')
-        for name in g:sidebar_session
-            call s:open(name)
-        endfor
-        " unlet g:sidebar_session
-    endif
 endfunction
 
 function! s:is_sidebar(nr)
@@ -307,5 +449,22 @@ function! sidebar#get(...)
         return s:sidebars[a:1]
     else
         throw "only 1 argument is allowed"
+    endif
+endfunction
+
+function! sidebar#open_last_help(cmd)
+    let bufnr = 0
+    let lastused = 0
+    for nr in range(1, bufnr('$'))
+        if getbufvar(nr, '&buftype') ==# 'help'
+            if nr > bufnr || getbufinfo(nr)[0].lastused > lastused
+                let bufnr = nr
+                let lastused = getbufinfo(nr)[0].lastused
+            endif
+        endif
+    endfor
+    execute a:cmd . ' help'
+    if bufnr > 0
+        execute 'buffer ' . bufnr
     endif
 endfunction

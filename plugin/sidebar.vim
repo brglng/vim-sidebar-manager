@@ -6,6 +6,29 @@ let g:sidebar_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+let g:sidebar_left_width = get(g:, 'sidebar_left_width', 40)
+let g:sidebar_right_width = get(g:, 'sidebar_right_width', 40)
+let g:sidebar_top_height = get(g:, 'sidebar_top_height', 0.4)
+let g:sidebar_bottom_height = get(g:, 'sidebar_bottom_height', 0.4)
+let g:sidebar_move = get(g:, 'sidebar_move', 1)
+
+let s:default_opts = {
+\   'winfixwidth': 0,
+\   'winfixheight': 0,
+\   'number': 0,
+\   'foldcolumn': 0,
+\   'signcolumn': 'no',
+\   'colorcolumn': 0,
+\   'bufhidden': 'hide',
+\   'buflisted': 0,
+\ }
+
+if exists('g:sidebar_opts')
+    let g:sidebar_opts = extend(g:sidebar_opts, s:default_opts)
+else
+    let g:sidebar_opts = s:default_opts
+endif
+
 function! s:complete_sidebar_name(arg_lead, cmd_line, cursor_pos)
     let all_names = []
 
@@ -42,12 +65,11 @@ command! -nargs=1 -complete=customlist,<SID>complete_position SidebarCloseSide c
 command! -nargs=0 SidebarCloseAll call sidebar#close_all()
 
 augroup sidebar
-autocmd!
-
-if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
-    autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
-endif
-
+    autocmd!
+    if get(g:, 'sidebar_close_tab_on_closing_last_buffer', 0)
+        autocmd WinEnter * call sidebar#close_tab_on_closing_last_buffer()
+    endif
+    autocmd BufWinEnter,FileType * call sidebar#setup_current_sidebar_window()
 augroup END
 
 let s:save_cpo = &cpo

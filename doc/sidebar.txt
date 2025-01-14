@@ -7,17 +7,11 @@ Contents~
 1. Introduction                                         |sidebar-introduction|
   1.1 Motivation                                          |sidebar-motivation|
 2. Examples                                                 |sidebar-examples|
-  2.1 NERDTree, Tagbar and Undotree |sidebar-example-nerdtree-tagbar-undotree|
-  2.1 coc-explorer, Vista.vim and Undotree
-                                 |sidebar-example-coc-explorer-vista-undotree|
-  2.2 QuickFix, Location List and Terminal
-                                   |sidebar-example-quickfix-loclist-terminal|
 3. Options                                                   |sidebar-options|
 4. Sidebar Properties                                     |sidebar-properties|
 5. Commands                                                 |sidebar-commands|
-6. Sessions                                                 |sidebar-sessions|
-7. Functions                                               |sidebar-functions|
-8. Credits                                                   |sidebar-credits|
+6. Functions                                               |sidebar-functions|
+7. Credits                                                   |sidebar-credits|
 
 ==============================================================================
 
@@ -46,136 +40,9 @@ plugin.
 
 2. Examples                                                 *sidebar-examples*
 
-2.1 NERDTree, Tagbar and Undotree   *sidebar-example-nerdtree-tagbar-undotree*
+Please checkout https://github.com/brglng/vim-sidebar-manager/wiki/Examples
+for examples.
 
-NERDTree: https://github.com/preservim/nerdtree
-Tagbar: https://github.com/majutsushi/tagbar
-Undotree: https://github.com/mbbill/undotree
-    >vim
-    let g:NERDTreeWinPos = 'left'
-    let g:NERDTreeWinSize = 40
-    let g:NERDTreeQuitOnOpen = 0
-    let g:tagbar_left = 1
-    let g:tagbar_width = 40
-    let g:tagbar_autoclose = 0
-    let g:tagbar_autofocus = 1
-    let g:undotree_SetFocusWhenToggle = 1
-    let g:undotree_SplitWidth = 40
-    
-    let g:sidebars = {
-      \ 'nerdtree': {
-      \     'position': 'left',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'nerdtree'},
-      \     'open': 'NERDTree',
-      \     'close': 'NERDTreeClose'
-      \ },
-      \ 'tagbar': {
-      \     'position': 'left',
-      \     'check_win': {nr -> bufname(winbufnr(nr)) =~ '__Tagbar__'},
-      \     'open': 'TagbarOpen',
-      \     'close': 'TagbarClose'
-      \ },
-      \ 'undotree': {
-      \     'position': 'left',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
-      \     'open': 'UndotreeShow',
-      \     'close': 'UndotreeHide'
-      \ }
-      \ }
-    
-    noremap <silent> <M-1> :call sidebar#toggle('nerdtree')<CR>
-    noremap <silent> <M-2> :call sidebar#toggle('tagbar')<CR>
-    noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
-<
-                                 *sidebar-example-coc-explorer-vista-undotree*
-
-2.1 coc-explorer, Vista.vim and Undotree
-
-coc-explorer: https://github.com/weirongxu/coc-explorer
-Vista.vim: https://github.com/liuchengxu/vista.vim
-Undotree: https://github.com/mbbill/undotree
-    >vim
-    let g:vista_sidebar_position = 'vertical topleft'
-    let g:vista_sidebar_width = 40
-    let g:undotree_SetFocusWhenToggle = 1
-    let g:undotree_SplitWidth = 40
-    
-    let g:sidebars = {
-      \ 'coc-explorer': {
-      \     'position': 'left',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'coc-explorer'},
-      \     'open': 'CocCommand explorer --no-toggle',
-      \     'close': 'CocCommand explorer --toggle'
-      \ },
-      \ 'vista': {
-      \     'position': 'left',
-      \     'check_win': {nr -> bufname(winbufnr(nr)) =~ '__vista__'},
-      \     'open': 'Vista',
-      \     'close': 'Vista!'
-      \ },
-      \ 'undotree': {
-      \     'position': 'left',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'undotree'},
-      \     'open': 'UndotreeShow',
-      \     'close': 'UndotreeHide'
-      \ }
-      \ }
-
-    noremap <silent> <M-1> :call sidebar#toggle('coc-explorer')<CR>
-    noremap <silent> <M-2> :call sidebar#toggle('vista')<CR>
-    noremap <silent> <M-3> :call sidebar#toggle('undotree')<CR>
-<
-                                   *sidebar-example-quickfix-loclist-terminal*
-
-2.2 QuickFix, Location List and Terminal
-
-vim-terminal-help: https://github.com/skywind3000/vim-terminal-help
-    >vim
-    autocmd FileType qf call s:setup_quickfix_window()
-    function! s:setup_quickfix_window()
-        wincmd J
-        10wincmd _
-        setlocal wrap foldcolumn=0 colorcolumn= signcolumn=no cursorline
-        nnoremap <silent> <buffer> q <C-w>q
-    endfunction
-    
-    let g:sidebars = {
-      \ 'quickfix': {
-      \     'position': 'bottom',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'qf' &&
-      \                         !getwininfo(win_getid(nr))[0]['loclist']},
-      \     'open': 'copen',
-      \     'close': 'cclose'
-      \ },
-      \ 'loclist': {
-      \     'position': 'bottom',
-      \     'check_win': {nr -> getwinvar(nr, '&filetype') ==# 'qf' &&
-      \                         getwininfo(win_getid(nr))[0]['loclist']},
-      \     'open': 'silent! lopen',
-      \     'close': 'silent! lclose'
-      \ },
-      \ 'terminal': {
-      \     'position': 'bottom',
-      \     'get_win': {-> exists('t:__terminal_bid__') ?
-      \                    bufwinnr(t:__terminal_bid__) : 0},
-      \     'open': 'call TerminalOpen()',
-      \     'close': 'call TerminalClose()'
-      \ }
-      \ }
-    
-    noremap <silent> <M-6> :call sidebar#toggle('quickfix')<CR>
-    noremap <silent> <M-7> :call sidebar#toggle('loclist')<CR>
-    noremap <silent> <M-=> :call sidebar#toggle('terminal')<CR>
-    if has('nvim')
-        tnoremap <silent> <M-6> <C-\><C-n>:call sidebar#toggle('quickfix')<CR>
-        tnoremap <silent> <M-7> <C-\><C-n>:call sidebar#toggle('loclist')<CR>
-        tnoremap <silent> <M-=> <C-\><C-n>:call sidebar#toggle('terminal')<CR>
-    else
-        tnoremap <silent> <M-6> <C-_>:call sidebar#toggle('quickfix')<CR>
-        tnoremap <silent> <M-7> <C-_>:call sidebar#toggle('loclist')<CR>
-        tnoremap <silent> <M-=> <C-_>:call sidebar#toggle('terminal')<CR>
-    endif
-<
 ==============================================================================
 
 3. Options                                                   *sidebar-options*
@@ -197,6 +64,59 @@ g:sidebar_close_tab_on_closing_last_buffer
 
     Default: 0
 
+g:sidebar_left_width                                    *g:sidebar_left_width*
+
+    The default width of the sidebar on the left side. Must be a |Number| or
+    |Float|. If the value is less than 1, it is treated as a percentage.
+
+    Default: 40
+
+g:sidebar_right_width                                  *g:sidebar_right_width*
+
+    The default width of the sidebar on the right side. Must be a |Number| or
+    |Float|. If the value is less than 1, it is treated as a percentage.
+
+    Default: 40
+
+g:sidebar_top_height                                    *g:sidebar_top_height*
+
+    The default height of the sidebar on the top side. Must be a |Number| or
+    |Float|. If the value is less than 1, it is treated as a percentage.
+
+    Default: 0.4
+
+g:sidebar_bottom_height                              *g:sidebar_bottom_height*
+
+    The default height of the sidebar on the bottom side. Must be a |Number| or
+    |Float|. If the value is less than 1, it is treated as a percentage.
+
+    Default: 0.4
+
+g:sidebar_move                                                *g:sidebar_move*
+
+    Whether or not to move the sidebar window to its corresponding side when
+    opening the sidebar.
+
+    Default: 1
+
+g:sidebar_opts                                                *g:sidebar_opts*
+
+    A |dict| of local options to be set when opening the sidebar.
+
+    Default:
+
+    let g:sidebar_opts = {
+    \   'winfixwidth': 0,
+    \   'winfixheight': 0,
+    \   'winhighlight': 'Normal:NormalFloat',
+    \   'number': 0,
+    \   'foldcolumn': 0,
+    \   'signcolumn': 'no',
+    \   'colorcolumn': 0,
+    \   'bufhidden': 'hide',
+    \   'buflisted': 0,
+    \ }
+
 ==============================================================================
 
 4. Sidebar Properties                                     *sidebar-properties*
@@ -210,18 +130,22 @@ position                                           *sidebar-property-position*
     your window's size. If you want to, e.g., place the |Tagbar| in the right,
     you must adjust the options of the |Tagbar| plugin.
 
-check_win                                         *sidebar-property-check_win*
+filter                                               *sidebar-property-filter*
 
     A |Funcref| who takes the window number (|winnr|) as an argument, and returns
     a |Number| to indicate whether or not the window corresponding to the window
     number is the sidebar window of this kind. This property is optional if
     the get_win property is present.
 
+check_win                                         *sidebar-property-check_win*
+
+    Same as |sidebar-property-filter|. This property is deprecated.
+
 get_win                                             *sidebar-property-get_win*
 
     A |Funcref| or |string| expression returning the window number (|winnr|) of the
-    sidebar. This property is optional if the `check_win` property is present. If
-    both `check_win` and `get_win` are present, `get_win` will take precedence.
+    sidebar. This property is optional if the `filter` property is present. If
+    both `filter` and `get_win` are present, `get_win` will take precedence.
 
 dont_close                                       *sidebar-property-dont_close*
 
@@ -230,7 +154,9 @@ dont_close                                       *sidebar-property-dont_close*
     closed before switching to this sidebar window. This property is useful
     when a plugin already provides page-like switching.
 
-    e.g., It is not necessary to close the neo-tree.nvim window when switching
+    Example:
+
+    It is not necessary to close the neo-tree.nvim window when switching
     between its "Files" and "Symbols" pages. This can be achieved with this
     property:
 >vim
@@ -264,6 +190,30 @@ open                                                   *sidebar-property-open*
 close                                                 *sidebar-property-close*
 
     A |string| of Ex command or a |Funcref| to close the sidebar.
+
+width                                                 *sidebar-property-width*
+
+    The width of the sidebar. Must be a |Number|, |Float| or |Funcref|. If the
+    value is less than 1, it is treated as a percentage. If omitted, the value
+    of |g:sidebar_left_width| or |g:sidebar_right_width| is used according to
+    the position.
+
+height                                               *sidebar-property-height*
+
+    The height of the sidebar. Must be a |Number|, |Float| or |Funcref|. If the
+    value is less than 1, it is treated as a percentage. If omitted, the value
+    of |g:sidebar_top_height| or |g:sidebar_bottom_height| is used according
+    to the position.
+
+move                                                   *sidebar-property-move*
+
+    Whether or not to move the sidebar window to its corresponding side when
+    opening the sidebar. If omitted, the value of |g:sidebar_move| is used.
+
+opts                                                   *sidebar-property-opts*
+
+    A |dict| of local options to be set when opening the sidebar. If omitted,
+    the value of |g:sidebar_opts| is used.
 
 ==============================================================================
 
@@ -301,23 +251,20 @@ SidebarCloseAll                                              *SidebarCloseAll*
 
 ==============================================================================
 
-6. Sessions                                                 *sidebar-sessions*
-
-If you are using |Startify|, you may want to add this line in your vimrc:
-    >vim
-    let g:startify_session_before_save = ['call sidebar#close_all()']
-<
-This closes all sidebar windows before saving the session using the |SSave|
-command.
-
-==============================================================================
-
-7. Functions                                               *sidebar-functions*
+6. Functions                                               *sidebar-functions*
 
 sidebar#register({desc})                                  *sidebar#register()*
 
     Register a sidebar. The argument {desc} must be a |dict|, with the name of
     the sidebar as the `'name'` key, and all the properties of the sidebar.
+    This function is automatically called on startup for each sidebar defined
+    in |g:sidebar|.
+
+sidebar#get(...)                                               *sidebar#get()*
+
+    If a parameter is given, return the properties of the sidebar of the given
+    name. If no parameter is given, return a list of the properties of all
+    registered sidebars.
 
 sidebar#switch({name})                                      *sidebar#switch()*
 
@@ -360,9 +307,40 @@ sidebar#close_all()                                      *sidebar#close_all()*
 
     Close all sidebars.
 
+sidebar#is_sidebar({nr})                                *sidebar#is_sidebar()*
+
+    Return 1 if the window number {nr} is a sidebar window, otherwise 0.
+
+sidebar#get_current_sidebar()                  *sidebar#get_current_sidebar()*
+
+    Return a list, where the first element is the window number of the current
+    sidebar window, and the second element is the property dictionary of the
+    sidebar. If the current window is not a sidebar window, [0, {}] is
+    returned.
+
+sidebar#setup_current_sidebar_window()
+                                      *sidebar#setup_current_sidebar_window()*
+
+    This function does the following:
+    1. Move the current sidebar window to its corresponding side.
+    2. Set the width or height of the sidebar window.
+    3. Set the local options of the sidebar window.
+    4. Define key mappings for the sidebar window.
+
+sidebar#close_tab_on_closing_last_buffer()
+                                  *sidebar#close_tab_on_closing_last_buffer()*
+
+    Close the tab page when closing the last window that is not a sidebar.
+
+sidebar#open_last_help()                            *sidebar#open_last_help()*
+                             
+    Open the last help window. This function is useful when you want to open
+    the last help window when toggling the help window as a sidebar. To use it,
+    specify this function as |sidebar-property-open| of the help sidebar.
+
 ==============================================================================
 
-8. Credits                                                   *sidebar-credits*
+7. Credits                                                   *sidebar-credits*
 
 If you like this plugin, check out the GitHub for more information at
 https://github.com/brglng/vim-sidebar-manager
