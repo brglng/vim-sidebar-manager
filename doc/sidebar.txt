@@ -108,7 +108,6 @@ g:sidebar_opts                                                *g:sidebar_opts*
     let g:sidebar_opts = {
     \   'winfixwidth': 0,
     \   'winfixheight': 0,
-    \   'winhighlight': 'Normal:NormalFloat',
     \   'number': 0,
     \   'foldcolumn': 0,
     \   'signcolumn': 'no',

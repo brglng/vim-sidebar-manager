@@ -15,7 +15,6 @@ let g:sidebar_move = get(g:, 'sidebar_move', 1)
 let s:default_opts = {
 \   'winfixwidth': 0,
 \   'winfixheight': 0,
-\   'winhighlight': 'Normal:NormalFloat',
 \   'number': 0,
 \   'foldcolumn': 0,
 \   'signcolumn': 'no',
