@@ -150,6 +150,16 @@ function! s:open(name)
     endif
 endfunction
 
+function! s:wait_for_close(position)
+    while 1
+        let found_wins = s:find_windows_at_position(a:position)
+        sleep 30m
+        if len(found_wins) == 0
+            break
+        endif
+    endwhile
+endfunction
+
 function! s:close(name)
     if has_key(s:sidebars[a:name], 'close')
         call s:call_or_exec(s:sidebars[a:name].close)
@@ -159,6 +169,7 @@ function! s:close(name)
             execute nr . 'wincmd q'
         endif
     endif
+    call s:wait_for_close(s:sidebars[a:name].position)
 endfunction
 
 function! s:dont_close(prev, next)
